@@ -9,7 +9,7 @@ app.use(express.static('./public')); // to have the access to static files in th
 
 
 app.use('/' , ( req , res)=>{
-    res.render('home');
+    res.render('lobby');
 })
 
 

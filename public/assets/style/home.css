@@ -1,36 +1,38 @@
-.home-main-section{
+.home-main-section {
+    margin: 50px 0 0 0;
     width: 100%;
 }
 
-.home-main-section .mines-container{
-    width: 500px;
-    height: 500px;
+.home-main-section .mines-container {
+    width: 503px;
+    height: 503px;
     margin: auto;
-    border: solid #808080;
+    border: solid #222222 2px;
+    display: grid;
+    grid-template-columns: repeat(20, auto);
+    grid-auto-rows: max-content;
 }
 
-.mines-container span{
+.home-main-section .mines-container span.square {
     display: block;
     position: relative;
     width: 25px;
     height: 25px;
     background: #c0c0c0;
     box-sizing: border-box;
-    /*border: solid #808080;*/
-    /*border-width: 0 1px 1px 0;*/
     overflow: hidden;
     cursor: pointer;
     border: 2px outset #ececec;
 }
 
-.mines-container span:active{
+.home-main-section .mines-container span.square:active {
     background: #bdbdbd;
     border: solid #999;
     border-width: 2px 0 0 2px;
 }
 
-.mines-container span.opened{
-    /*border: solid #808080;*/
-    border: solid transparent;
-
+.home-main-section .mines-container span.square.opened {
+    background-color: #a6a4a4;
+    border: solid #222222;
+    border-width: 0 1px 1px 0;
 }
