@@ -1,0 +1,24 @@
+{
+  "name": "minesweeper",
+  "version": "1.0.0",
+  "description": "Multiplayer Minesweeper game using Node.js, MongoDB, and WebSocket technology for real-time interaction.",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/Alihh961/Minesweeper.git"
+  },
+  "author": "Ali HH",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alihh961/Minesweeper/issues"
+  },
+  "homepage": "https://github.com/Alihh961/Minesweeper#readme",
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.19.2",
+    "nodemon": "^3.1.0"
+  }
+}

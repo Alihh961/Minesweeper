@@ -1,0 +1,36 @@
+.home-main-section{
+    width: 100%;
+}
+
+.home-main-section .mines-container{
+    width: 500px;
+    height: 500px;
+    margin: auto;
+    border: solid #808080;
+}
+
+.mines-container span{
+    display: block;
+    position: relative;
+    width: 25px;
+    height: 25px;
+    background: #c0c0c0;
+    box-sizing: border-box;
+    /*border: solid #808080;*/
+    /*border-width: 0 1px 1px 0;*/
+    overflow: hidden;
+    cursor: pointer;
+    border: 2px outset #ececec;
+}
+
+.mines-container span:active{
+    background: #bdbdbd;
+    border: solid #999;
+    border-width: 2px 0 0 2px;
+}
+
+.mines-container span.opened{
+    /*border: solid #808080;*/
+    border: solid transparent;
+
+}
