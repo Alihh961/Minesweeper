@@ -3,44 +3,34 @@
     <title>Minesweeper-Lobby</title>
 
 </head>
-<%- include('./partials/header.ejs')%>
+<%- include('./partials/header.ejs') %>
 
 <section class="lobby-main-section">
 
-<!--    <div class="username-box">-->
-<!--        <label for="username">Enter Player Name:</label>-->
-<!--        <input id="username" type="text" placeholder="Player Name" name="username">-->
-<!--    </div>-->
+    <!--    <div class="username-box">-->
+    <!--        <label for="username">Enter Player Name:</label>-->
+    <!--        <input id="username" type="text" placeholder="Player Name" name="username">-->
+    <!--    </div>-->
 
     <div class="username-box ">
         <div class="box-inner">
             <label for="username-input">Enter a username</label>
-            <form name="lobby-form" action="">
-            <div class="container">
-<!--                <div class="icon">-->
+            <form name="lobby-form" action="" method="POST">
+                <div class="container">
                     <button type='submit' class="go-button">Go!</button>
-<!--                </div>-->
-                <div class="input-container">
-                    <input placeholder="Enter a username..." id="username-input" name="username" required/>
+                    <div class="input-container">
+                        <input placeholder="Enter a username..." id="username-input" name="username" required/>
+
+                    </div>
+
 
                 </div>
 
-
-            </div>
-<!--                <div class="save-username-container">-->
-<!--                    <label for="save-username">-->
-
-<!--                    </label>-->
-
-<!--                    <input type="checkbox" id="save-username">-->
-
-                    <div class="checkbox-wrapper-10">
-                        <label class="label-text">save username ?</label>
-                        <input class="tgl tgl-flip" id="cb5" type="checkbox"  />
-                        <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>
-                    </div>
-<!--                </div>-->
-
+                <div class="checkbox-wrapper-10">
+                    <label class="label-text">save username ?</label>
+                    <input class="tgl tgl-flip" id="cb5" type="checkbox"/>
+                    <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>
+                </div>
 
             </form>
         </div>
