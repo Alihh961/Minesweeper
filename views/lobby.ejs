@@ -7,8 +7,25 @@
 
 <section class="lobby-main-section">
 
-    <div class="username-box">
-        <label for="username">Enter Player Name:</label>
-        <input id="username" type="text" placeholder="Player Name" name="username">
+<!--    <div class="username-box">-->
+<!--        <label for="username">Enter Player Name:</label>-->
+<!--        <input id="username" type="text" placeholder="Player Name" name="username">-->
+<!--    </div>-->
+
+    <div class="username-box ">
+        <div class="box-inner">
+            <label for="username-input">Enter a username</label>
+            <form name="lobby-form" action="">
+            <div class="container">
+<!--                <div class="icon">-->
+                    <button type='submit' class="go-button">Go!</button>
+<!--                </div>-->
+                <div class="input-container">
+                    <input placeholder="Enter a username..." id="username-input" name="username" required/>
+                </div>
+
+            </div>
+            </form>
+        </div>
     </div>
 </section>
