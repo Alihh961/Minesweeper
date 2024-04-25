@@ -27,6 +27,11 @@ if (pageTitle === 'Minesweeper') {
 }
 
 if (pageTitle === 'Minesweeper-Lobby') {
+
+    if(localStorage.getItem('username')){
+        let usernameInput = document.querySelector('#username-input');
+        usernameInput.value = localStorage.getItem('username');
+    }
     const goBtn = document.querySelector('.go-button');
 
     goBtn.addEventListener('click', (event) => {
@@ -34,6 +39,7 @@ if (pageTitle === 'Minesweeper-Lobby') {
 
         // const username = document.querySelector('#username-input').value;
         const username = {username: document.querySelector('#username-input').value}
+        const checkBoxStatus = document.querySelector('#cb5');
 
         if (!username) {
             Swal.fire({
@@ -51,6 +57,10 @@ if (pageTitle === 'Minesweeper-Lobby') {
                 body: JSON.stringify(username),
             }).then(response => {
                 if (!response.ok) {
+                    if(!checkBoxStatus){
+                        localStorage.removeItem('username');
+
+                    }
                     // Handle error response
                     if (response.status == 409) {
                         throw new Error('User already exists');
@@ -63,6 +73,11 @@ if (pageTitle === 'Minesweeper-Lobby') {
             }).then(data => {
                 // Display message based on the response data or status
                 if (data.status === 201) {
+                    if (checkBoxStatus) {
+                        localStorage.setItem('username', username.username);
+                    } else {
+                        localStorage.removeItem('username');
+                    }
                     Swal.fire({
                         title: `${username.username} ,Are you ready to start?`,
                         icon: 'success',
@@ -91,6 +106,11 @@ if (pageTitle === 'Minesweeper-Lobby') {
                         }
                     });
                 } else if (data.status === 409) {
+                    if (!checkBoxStatus) {
+                        localStorage.removeItem('username');
+
+                    }
+                    ;
                     Swal.fire({
                         icon: "error",
                         text: "Username exists already",
