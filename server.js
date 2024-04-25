@@ -6,7 +6,8 @@ const port = process.env.PORT || 3000;
 
 
 
-mongoose.connect(`${process.env.DATABASE_URI}`).then((conn)=>{
+mongoose.connect(`${process.env.DATABASE_URI}/Minesweeper`).then((conn)=>{
+    // console.log(conn);
     console.log('Connected successfully to the database');
 }).catch((err)=>{
     console.log(err)
@@ -15,5 +16,4 @@ mongoose.connect(`${process.env.DATABASE_URI}`).then((conn)=>{
 
 app.listen(port , ()=>{
     console.log(`Server started at port : ${port}`);
-    console.log(`${process.env.DATABASE_URI}/${process.env.DATABASE_NAME}`);
 });

@@ -20,7 +20,10 @@
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
+    "jquery": "^3.7.1",
     "mongoose": "^8.3.2",
-    "nodemon": "^3.1.0"
+    "nodemon": "^3.1.0",
+    "sweetalert": "^2.1.2",
+    "validator": "^13.11.0"
   }
 }
