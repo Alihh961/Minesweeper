@@ -8,7 +8,7 @@ if (pageTitle === 'Minesweeper') {
 
     const squaresContainer = document.querySelector('.mines-container');
 
-    for (i = 0; i < 20 * 20; i++) {
+    for (i = 0; i < 100; i++) {
         var span = document.createElement('span');
 
         span.classList.add('square');

@@ -4,12 +4,12 @@
 }
 
 .home-main-section .mines-container {
-    width: 503px;
-    height: 503px;
+    width: 253px;
+    height: 253px;
     margin: auto;
     border: solid #222222 2px;
     display: grid;
-    grid-template-columns: repeat(20, auto);
+    grid-template-columns: repeat(10, auto);
     grid-auto-rows: max-content;
 }
 
