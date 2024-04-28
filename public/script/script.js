@@ -1,3 +1,5 @@
+
+
 console.log('Script js file works');
 
 
@@ -6,9 +8,30 @@ const pageTitle = document.querySelector('title').innerHTML;
 // Home Page
 if (pageTitle === 'Minesweeper') {
 
+
+    //
+    //
+    // console.log(socket);
+    //
+    // // Event handler for successful connection
+    // socket.on('connect', () => {
+    //     console.log('Connected to Socket.io server');
+    // });
+    //
+    // // Event handler for disconnect
+    // socket.on('disconnect', () => {
+    //     console.log('Disconnected from Socket.io server');
+    // });
+
+
+
+
+
+
+
     const squaresContainer = document.querySelector('.mines-container');
 
-    for (i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
         var span = document.createElement('span');
 
         span.classList.add('square');
