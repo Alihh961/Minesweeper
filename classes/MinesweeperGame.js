@@ -1,10 +1,10 @@
 class MinesweeperGame {
 
     constructor() {
-        this.objects = this.generateObjects();
+        this.objects = this._generateObjects();
     }
 
-    generateObjects() {
+    _generateObjects() {
 
         const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
         const lifes = "+";
@@ -24,18 +24,32 @@ class MinesweeperGame {
             arrayOfObjects.push(mines);
         }
 
-        arrayOfObjects = this.shuffleArray(arrayOfObjects);
+        arrayOfObjects = this._shuffleArray(arrayOfObjects);
 
         return arrayOfObjects;
     }
 
-    shuffleArray(array) {
+    _shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
             [array[i], array[j]] = [array[j], array[i]];
         }
 
         return array;
+    }
+
+    getObjects(){
+        return this.objects;
+    }
+
+    returnThenRemoveAnObject(index){
+
+
+        const randomValue = this.getObjects()[index];
+
+        this.getObjects()[index] = null;
+
+        return randomValue;
     }
 
 }

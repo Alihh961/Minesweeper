@@ -1,6 +1,7 @@
 const express = require ('express');
 const path = require('path');
 const userRouter = require('./routes/UserRouter');
+let MinesweeperGame = require('./classes/MinesweeperGame');
 
 const http = require('http');
 const socketIO = require('socket.io');
@@ -37,15 +38,43 @@ mongoose.connect(`${process.env.DATABASE_URI}/Minesweeper`).then((conn)=>{
 
 
 io.on('connection' , (socket)=>{
+
+    let game = new MinesweeperGame();
+
+
     console.log('A new user just connected');
+
+    socket.on('disconnect' , ()=>{
+        console.log('User disconnected');
+    });
+
+    socket.on('squareClicked' , (data)=>{
+        let id = data.id;
+        const value = game.returnThenRemoveAnObject(id);
+
+        socket.emit('receiveSquareContent' , {
+        value ,
+            id
+        });
+
+    });
+
 });
+
+
 
 server.listen(port || 3000 , ()=>{
     console.log('Server connected');
 })
 
-app.get('/' , (req , res)=>{
+app.get('/home' , (req , res)=>{
     res.render('home');
-})
+});
+
+app.use('/user' , userRouter.router);
+app.use('/' , ( req , res)=>{
+    res.render('lobby');
+});
+
 
 module.exports = server;

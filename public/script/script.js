@@ -1,5 +1,3 @@
-
-
 console.log('Script js file works');
 
 
@@ -8,25 +6,16 @@ const pageTitle = document.querySelector('title').innerHTML;
 // Home Page
 if (pageTitle === 'Minesweeper') {
 
+    // Socket
 
-    //
-    //
-    // console.log(socket);
-    //
-    // // Event handler for successful connection
-    // socket.on('connect', () => {
-    //     console.log('Connected to Socket.io server');
-    // });
-    //
-    // // Event handler for disconnect
-    // socket.on('disconnect', () => {
-    //     console.log('Disconnected from Socket.io server');
-    // });
+    let socket = io();
+    socket.on('connect', () => {
+        console.log('Connected to the server')
+    });
 
-
-
-
-
+    socket.on('disconnect', () => {
+        console.log('disconnected from the server');
+    });
 
 
     const squaresContainer = document.querySelector('.mines-container');
@@ -35,6 +24,7 @@ if (pageTitle === 'Minesweeper') {
         var span = document.createElement('span');
 
         span.classList.add('square');
+        span.setAttribute('data-square' , `${i}`);
 
         squaresContainer.appendChild(span);
     }
@@ -42,16 +32,56 @@ if (pageTitle === 'Minesweeper') {
 
     var squares = document.querySelectorAll('.square');
 
+
+
+
     squares.forEach((square) => {
-        square.addEventListener('click', () => {
-            square.classList.add('opened');
-        })
-    })
+        square.addEventListener('click', (event) => {
+            let clickedSquare = event.target;
+            let id = clickedSquare.getAttribute('data-square');
+            // Emit the squareClicked event to the server
+            socket.emit('squareClicked', {
+                message: 'A square was clicked!' ,
+                id
+            });
+
+            // Add the 'opened' class to the clicked square
+            clickedSquare.classList.add('opened');
+
+        });
+    });
+
+
+    socket.on('receiveSquareContent', function(data) {
+
+        let clickedSquare = document.querySelector(`[data-square="${data.id}"]`);
+        let value = data.value;
+
+        if(clickedSquare){
+           if(typeof(value) === "number"){
+               clickedSquare.innerHTML = data.value;
+
+           }else if(value === "-"){
+               clickedSquare.classList.add('mine');
+               clickedSquare.innerHTML = "\u26CC";
+
+           }else if(value === "+"){
+               clickedSquare.classList.add('heart');
+               clickedSquare.innerHTML = "\u2665";
+
+           }else{
+               console.log("error")
+           }
+
+        }
+    });
+
+
 }
 
 if (pageTitle === 'Minesweeper-Lobby') {
 
-    if(localStorage.getItem('username')){
+    if (localStorage.getItem('username')) {
         let usernameInput = document.querySelector('#username-input');
         usernameInput.value = localStorage.getItem('username');
     }
@@ -80,7 +110,7 @@ if (pageTitle === 'Minesweeper-Lobby') {
                 body: JSON.stringify(username),
             }).then(response => {
                 if (!response.ok) {
-                    if(!checkBoxStatus){
+                    if (!checkBoxStatus) {
                         localStorage.removeItem('username');
 
                     }

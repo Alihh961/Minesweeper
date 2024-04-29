@@ -23,8 +23,18 @@
     overflow: hidden;
     cursor: pointer;
     border: 2px outset #ececec;
+    text-align: center;
+    font-weight: 900;
+    font-size: 20px;
 }
 
+.home-main-section .mines-container span.square.heart {
+    color: green;
+}
+
+.home-main-section .mines-container span.square.mine {
+    color: red;
+}
 .home-main-section .mines-container span.square:active {
     background: #bdbdbd;
     border: solid #999;
@@ -35,4 +45,5 @@
     background-color: #a6a4a4;
     border: solid #222222;
     border-width: 0 1px 1px 0;
+    pointer-events: none;
 }
