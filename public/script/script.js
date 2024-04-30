@@ -1,14 +1,18 @@
 console.log('Script js file works');
 
+let btn = document.createElement('button');
+btn.innerText  = 'click to send';
+document.body.appendChild(btn);
 
 const pageTitle = document.querySelector('title').innerHTML;
 
-// Home Page
-if (pageTitle === 'Minesweeper') {
+// Game Page
+if (pageTitle === 'Minesweeper-Game') {
 
     // Socket
 
     let socket = io();
+
     socket.on('connect', () => {
         console.log('Connected to the server')
     });
@@ -16,6 +20,40 @@ if (pageTitle === 'Minesweeper') {
     socket.on('disconnect', () => {
         console.log('disconnected from the server');
     });
+    socket.emit('sendMessageToAllUsers',{from : 'Ali', text: 'Hello MotherFuckers'});
+
+    socket.on('newMessage' , (data)=>{
+        console.log(data);
+    });
+
+    socket.on('newUserConnected' , (data)=>{
+
+        const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.onmouseenter = Swal.stopTimer;
+                toast.onmouseleave = Swal.resumeTimer;
+            }
+        });
+        Toast.fire({
+            icon: "info",
+            title: data.message
+        });
+
+    })
+
+
+    btn.onclick = ()=>{
+
+        socket.emit('sendMessageToAllUsers' , {
+            text : 'Message sent to all users'
+        });
+
+    }
 
 
     const squaresContainer = document.querySelector('.mines-container');
@@ -77,22 +115,29 @@ if (pageTitle === 'Minesweeper') {
     });
 
 
+
+
 }
 
-if (pageTitle === 'Minesweeper-Lobby') {
+if (pageTitle === 'Minesweeper-Home') {
 
     if (localStorage.getItem('username')) {
         let usernameInput = document.querySelector('#username-input');
         usernameInput.value = localStorage.getItem('username');
     }
+
+
     const goBtn = document.querySelector('.go-button');
 
     goBtn.addEventListener('click', (event) => {
         event.preventDefault();
 
         // const username = document.querySelector('#username-input').value;
-        const username = {username: document.querySelector('#username-input').value}
-        const checkBoxStatus = document.querySelector('#cb5');
+        const username = document.querySelector('#username-input').value;
+        // const checkBoxStatus  = document.querySelector('#cb5').checked;
+        const checkBoxStatus = false;
+
+
 
         if (!username) {
             Swal.fire({
@@ -107,10 +152,15 @@ if (pageTitle === 'Minesweeper-Lobby') {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(username),
+                body: JSON.stringify({
+                    username ,
+                    save : checkBoxStatus
+                }),
             }).then(response => {
                 if (!response.ok) {
+                    // localStorage.removeItem('username');
                     if (!checkBoxStatus) {
+
                         localStorage.removeItem('username');
 
                     }
@@ -127,12 +177,12 @@ if (pageTitle === 'Minesweeper-Lobby') {
                 // Display message based on the response data or status
                 if (data.status === 201) {
                     if (checkBoxStatus) {
-                        localStorage.setItem('username', username.username);
+                        localStorage.setItem('username', username);
                     } else {
                         localStorage.removeItem('username');
                     }
                     Swal.fire({
-                        title: `${username.username} ,Are you ready to start?`,
+                        title: `${username} ,Are you ready to start?`,
                         icon: 'success',
                         showConfirmButton: true,
                         confirmButtonText: "Lets Go!",
@@ -154,7 +204,7 @@ if (pageTitle === 'Minesweeper-Lobby') {
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = 'home';
+                            window.location.href = 'lobby';
 
                         }
                     });

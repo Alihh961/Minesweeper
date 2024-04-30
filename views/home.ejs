@@ -1,22 +1,38 @@
 <head>
 
-    <title>Minesweeper</title>
+    <title>Minesweeper-Home</title>
 
 </head>
-
 <%- include('./partials/header.ejs') %>
 
-
 <section class="home-main-section">
-    <div class="mines-container">
 
+    <!--    <div class="username-box">-->
+    <!--        <label for="username">Enter Player Name:</label>-->
+    <!--        <input id="username" type="text" placeholder="Player Name" name="username">-->
+    <!--    </div>-->
+
+    <div class="username-box ">
+        <div class="box-inner">
+            <label for="username-input">Enter a username</label>
+            <form name="home-form" action="" method="POST">
+                <div class="container">
+                    <button type='submit' class="go-button">Go!</button>
+                    <div class="input-container">
+                        <input placeholder="Enter a username..." id="username-input" name="username" required/>
+
+                    </div>
+
+
+                </div>
+
+<!--                <div class="checkbox-wrapper-10">-->
+<!--                    <label class="label-text">save username ?</label>-->
+<!--                    <input class="tgl tgl-flip" id="cb5" type="checkbox" hidden/>-->
+<!--                    <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>-->
+<!--                </div>-->
+
+            </form>
+        </div>
     </div>
 </section>
-
-
-
-<script>
-
-
-
-</script>

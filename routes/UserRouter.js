@@ -9,7 +9,9 @@ const userModel = require('../models/UserModel');
 const checkUsername = async (req, res) => {
 
     const userName= req.body.username;
+    const saveBoolean = req.body.save;
 
+    console.log(req.body);
     try {
         const user = await userModel.findOne({userName: userName});
 
@@ -21,7 +23,11 @@ const checkUsername = async (req, res) => {
             const newUser = new userModel({
                 userName: userName
             });
-            await newUser.save();
+            if(saveBoolean){
+                await newUser.save();
+
+            }
+            console.log(saveBoolean);
 
             res.status(201).json({message: "Username added successfully" , status : 201});
         }
