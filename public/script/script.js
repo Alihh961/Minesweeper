@@ -150,7 +150,7 @@ if (pageTitle === 'Minesweeper-Home') {
                 text: "Username can't be empty",
             });
         } else {
-            const url = `user/check-username`;
+            const url = `user/signup`;
 
             fetch(url, {
                 method: 'POST',
