@@ -172,13 +172,20 @@ if (pageTitle === 'Minesweeper-Home') {
                         localStorage.removeItem('username');
 
                     }
-                    // Handle error response
-                    if (response.status == 409) {
-                        throw new Error('User already exists');
-                    } else {
-                        throw new Error('Unknown error , try again later');
-                    }
+                    console.log(response);
+
+
+                    //
+                    // if (response.status === 409) {
+                    //     throw new Error(response.errorMessage);
+                    // } else {
+                    //     // console.log(response);
+                    //     throw new Error(response.errorMessage);
+                    // }
                 }
+
+
+
                 // If response is OK, return the response JSON data
                 return response.json();
             }).then(data => {
@@ -216,17 +223,19 @@ if (pageTitle === 'Minesweeper-Home') {
 
                         }
                     });
-                } else if (data.status === 409) {
+                } else if (data.code === 409 || 400) {
+
                     if (!checkBoxStatus) {
                         localStorage.removeItem('username');
 
-                    }
-                    ;
+                    };
                     Swal.fire({
                         icon: "error",
-                        text: "Username exists already",
+                        text: data.message,
                     });
                 } else {
+
+
                     Swal.fire({
                         icon: "error",
                         text: "Unknown response status",
@@ -234,6 +243,7 @@ if (pageTitle === 'Minesweeper-Home') {
                 }
             })
                 .catch(error => {
+                    console.log(error);
                     Swal.fire({
                         icon: "error",
                         text: error.message,
