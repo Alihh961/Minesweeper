@@ -190,7 +190,7 @@ if (pageTitle === 'Minesweeper-Home') {
                         localStorage.removeItem('username');
                     }
                     Swal.fire({
-                        title: `${username} ,Are you ready to start?`,
+                        title: `${username} , Are you ready to start?`,
                         icon: 'success',
                         showConfirmButton: true,
                         confirmButtonText: "Lets Go!",

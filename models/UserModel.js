@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 
 const userSchema = new mongoose.Schema({
@@ -37,6 +38,17 @@ const userSchema = new mongoose.Schema({
     toJSON: {virtuals: true}, // this is to get the virtual properties to be displayed in the output
     toObject: {virtuals: true}
 });
+
+
+userSchema.pre('save' ,async function(next){
+
+    this.password = await bcrypt.hash(this.password, 12);
+    this.confirmedPassword = undefined;
+    next();
+
+});
+
+
 
 const userModel = mongoose.model("users", userSchema);
 
