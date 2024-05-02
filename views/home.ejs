@@ -12,9 +12,9 @@
     <!--        <input id="username" type="text" placeholder="Player Name" name="username">-->
     <!--    </div>-->
 
-    <div class="username-box ">
+    <div class="form-box ">
         <div class="box-inner">
-            <span class="alert-message">Email validation isn't required!</span>
+            <span class="alert-message">New User ?</span>
             <form name="create-form" action="" method="POST">
                 <div class="container">
                     <div>
@@ -28,7 +28,7 @@
                     <div>
                         <label for="email-input">Email:</label>
                         <div class="input-container">
-                            <input placeholder="Enter an email..." id="email-input" name="username" required/>
+                            <input placeholder="Enter an email..." id="email-input" name="email" required/>
 
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                     <div>
                         <label for="password-input">Password:</label>
                         <div class="input-container">
-                            <input placeholder="Enter a password..." id="password-input" name="username" required/>
+                            <input placeholder="Enter a password..." id="password-input" name="password" required/>
 
                         </div>
                     </div>
@@ -44,12 +44,12 @@
                     <div>
                         <label for="confirmPassword-input">Re-Type Password:</label>
                         <div class="input-container">
-                            <input placeholder="Re-enter the password..." id="confirmPassword-input" name="username" required/>
+                            <input placeholder="Re-enter the password..." id="confirmPassword-input"
+                                   name="confirmPassword"
+                                   required/>
 
                         </div>
                     </div>
-
-
 
 
                 </div>
@@ -59,9 +59,35 @@
                 <!--                    <input class="tgl tgl-flip" id="cb5" type="checkbox" hidden/>-->
                 <!--                    <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>-->
                 <!--                </div>-->
-                                    <button type='submit' class="go-button">Go!</button>
+                <button type='submit' class="go-button">Go!</button>
 
             </form>
         </div>
+
+        <div class="separator">
+            or
+
+        </div>
+        <p class="">Login</p>
+
+        <form name="login-form" action="/login" method="POST">
+            <div>
+                <label for="email-input">Email:</label>
+                <div class="input-container">
+                    <input placeholder="Enter your email..." id="email-input" name="email" required/>
+
+                </div>
+            </div>
+
+            <div>
+                <label for="email-input">Password:</label>
+                <div class="input-container">
+                    <input placeholder="Enter the password..." id="password-input" name="password" required/>
+
+                </div>
+            </div>
+        </form>
     </div>
+
+
 </section>

@@ -16,10 +16,11 @@
 }
 
 
-.home-main-section .username-box {
+.home-main-section .form-box {
     padding: 1px;
     border-radius: 10px;
-    background: linear-gradient(-67deg, rgba(200, 216, 231, 0.7), rgba(255, 255, 255, 0.8));
+    background-color: #e2e9f4;
+    /*background: linear-gradient(-67deg, rgba(200, 216, 231, 0.7), rgba(255, 255, 255, 0.8));*/
     overflow: hidden;
     box-shadow: -2px -2px 6px rgba(255, 255, 255, 0.6), 2px 2px 12px #c8d8e7;
     width: 380px;
@@ -29,21 +30,21 @@
     left: 50%;
 }
 
-form[name='create-form']{
+form[name='create-form'] {
     display: flex;
     flex-direction: column;
     gap: 10px;
 
 }
 
-.home-main-section .username-box .box-inner {
+.home-main-section .form-box .box-inner {
     padding: 16px 16px;
     background-color: #e2e9f4;
     border-radius: 10px;
 }
 
-.home-main-section .username-box .box-inner span.alert-message{
-    margin: 0 auto 10px auto ;
+.home-main-section .form-box .box-inner span.alert-message {
+    margin: 0 auto 10px auto;
     width: fit-content;
     display: block;
     color: red;
@@ -51,21 +52,22 @@ form[name='create-form']{
 }
 
 
-.home-main-section .username-box .box-inner .container {
+.home-main-section .form-box .box-inner .container {
     display: flex;
     align-items: center;
     gap: 15px;
     flex-direction: column;
 }
 
-.home-main-section .username-box .box-inner .container > div{
+.home-main-section .form-box .box-inner .container > div, form[name='login-form'] > div {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
     justify-content: space-between;
 }
-/*.home-main-section .username-box .box-inner .container .go-button {*/
+
+/*.home-main-section .form-box .box-inner .container .go-button {*/
 /*    outline: none;*/
 /*    border: none;*/
 /*    color: #3c4b66;*/
@@ -126,7 +128,7 @@ form[name='create-form']{
     transform: translateY(2px);
 }
 
-.home-main-section .username-box .box-inner label {
+.home-main-section .form-box .box-inner label, form[name='login-form'] label {
     font-family: "Hind", sans-serif;
     display: block;
     color: #3c4b66;
@@ -137,7 +139,7 @@ form[name='create-form']{
 }
 
 
-.home-main-section .username-box .box-inner .container .input-container {
+.home-main-section .form-box .box-inner .container .input-container, form[name='login-form'] .input-container {
     --top-shadow: inset 1px 1px 3px #c5d4e3, inset 2px 2px 6px #c5d4e3;
     --bottom-shadow: inset -2px -2px 4px rgba(255, 255, 255, 0.7);
     position: relative;
@@ -146,8 +148,9 @@ form[name='create-form']{
     width: 75%;
 }
 
-.home-main-section .username-box .box-inner .container .input-container:before,
-.home-main-section .username-box .box-inner .container .input-container:after {
+.home-main-section .form-box .box-inner .container .input-container:before,
+.home-main-section .form-box .box-inner .container .input-container:after, form[name='login-form'] .input-container::before,
+form[name='login-form'] .input-container::after {
     left: 0;
     top: 0;
     display: block;
@@ -159,17 +162,20 @@ form[name='create-form']{
 
 }
 
-.home-main-section .username-box .box-inner .container .input-container:before {
+.home-main-section .form-box .box-inner .container .input-container:before,
+form[name='login-form'] .input-container::before {
     box-shadow: var(--bottom-shadow);
 }
 
-.home-main-section .username-box .box-inner .container .input-container:after {
+.home-main-section .form-box .box-inner .container .input-container:after,
+form[name='login-form'] .input-container::after {
     box-shadow: var(--top-shadow);
 }
 
-.home-main-section .username-box .box-inner .container .input-container input {
+.home-main-section .form-box .box-inner .container .input-container input,
+form[name='login-form'] .input-container input {
     background-color: #e3edf7;
-    padding: 16px 32px;
+    padding: 8px 16px;
     border: none;
     display: block;
     font-family: 'Orbitron', sans-serif;
@@ -181,18 +187,20 @@ form[name='create-form']{
     width: 100%;
 }
 
-.home-main-section .username-box .box-inner .container .input-container input::placeholder {
+.home-main-section .form-box .box-inner .container .input-container input::placeholder,
+form[name='login-form'] .input-container input::placeholder {
     color: #6d7f8f;
 }
 
-.home-main-section .username-box .box-inner .container .input-container input:focus {
+.home-main-section .form-box .box-inner .container .input-container input:focus,
+form[name='login-form'] .input-container input:focus {
     outline: none;
     color: #6d7f8f;
     background-color: #eff5fa;
 }
 
 
-.checkbox-wrapper-10{
+.checkbox-wrapper-10 {
     display: flex;
     justify-content: center;
     gap: 10px;
@@ -201,7 +209,7 @@ form[name='create-form']{
 
 }
 
-.checkbox-wrapper-10 label.label-text{
+.checkbox-wrapper-10 label.label-text {
     font-family: "Hind", sans-serif;
     color: #3c4b66;
     background: linear-gradient(45deg, rgba(107, 123, 143, 1), #3c4b66);
@@ -210,10 +218,10 @@ form[name='create-form']{
 }
 
 
+.checkbox-wrapper-10 .tgl {
+    display: none;
+}
 
- .checkbox-wrapper-10 .tgl {
-     display: none;
- }
 .checkbox-wrapper-10 .tgl,
 .checkbox-wrapper-10 .tgl:after,
 .checkbox-wrapper-10 .tgl:before,
@@ -223,6 +231,7 @@ form[name='create-form']{
 .checkbox-wrapper-10 .tgl + .tgl-btn {
     box-sizing: border-box;
 }
+
 .checkbox-wrapper-10 .tgl::-moz-selection,
 .checkbox-wrapper-10 .tgl:after::-moz-selection,
 .checkbox-wrapper-10 .tgl:before::-moz-selection,
@@ -239,6 +248,7 @@ form[name='create-form']{
 .checkbox-wrapper-10 .tgl + .tgl-btn::selection {
     background: none;
 }
+
 .checkbox-wrapper-10 .tgl + .tgl-btn {
     outline: 0;
     display: block;
@@ -251,6 +261,7 @@ form[name='create-form']{
     -ms-user-select: none;
     user-select: none;
 }
+
 .checkbox-wrapper-10 .tgl + .tgl-btn:after,
 .checkbox-wrapper-10 .tgl + .tgl-btn:before {
     position: relative;
@@ -259,12 +270,15 @@ form[name='create-form']{
     width: 50%;
     height: 100%;
 }
+
 .checkbox-wrapper-10 .tgl + .tgl-btn:after {
     left: 0;
 }
+
 .checkbox-wrapper-10 .tgl + .tgl-btn:before {
     display: none;
 }
+
 .checkbox-wrapper-10 .tgl:checked + .tgl-btn:after {
     left: 50%;
 }
@@ -275,6 +289,7 @@ form[name='create-form']{
     font-family: sans-serif;
     perspective: 100px;
 }
+
 .checkbox-wrapper-10 .tgl-flip + .tgl-btn:after,
 .checkbox-wrapper-10 .tgl-flip + .tgl-btn:before {
     display: inline-block;
@@ -285,35 +300,75 @@ form[name='create-form']{
     line-height: 2em;
     font-weight: bold;
     color: #fff;
-    position: absolute;
     top: 0;
     left: 0;
     -webkit-backface-visibility: hidden;
     backface-visibility: hidden;
     border-radius: 4px;
 }
+
 .checkbox-wrapper-10 .tgl-flip + .tgl-btn:after {
     content: attr(data-tg-on);
     background: #02C66F;
     transform: rotateY(-180deg);
 }
+
 .checkbox-wrapper-10 .tgl-flip + .tgl-btn:before {
     background: #FF3A19;
     content: attr(data-tg-off);
 }
+
 .checkbox-wrapper-10 .tgl-flip + .tgl-btn:active:before {
     transform: rotateY(-20deg);
 }
+
 .checkbox-wrapper-10 .tgl-flip:checked + .tgl-btn:before {
     transform: rotateY(180deg);
 }
+
 .checkbox-wrapper-10 .tgl-flip:checked + .tgl-btn:after {
     transform: rotateY(0);
     left: 0;
     background: #00a158;
 }
+
 .checkbox-wrapper-10 .tgl-flip:checked + .tgl-btn:active:after {
     transform: rotateY(20deg);
 }
 
+.separator {
+    display: flex;
+    align-items: center;
+}
+
+
+.separator::before {
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid #c4c4da;
+    margin: 24px 16px 24px 0;
+}
+
+.separator::after {
+    content: '';
+    flex: 1;
+    border-bottom: 2px solid #c4c4da;
+    margin: 24px 0 24px 16px;
+}
+
+.separator + p{
+    width: 100%;
+    text-align: center;
+    font-weight: 700;
+    color:red;
+}
+
+
+form[name='login-form'] {
+    padding: 16px;
+}
+
+form[name='login-form'] > div {
+    margin-bottom: 15px;
+}
 
