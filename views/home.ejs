@@ -14,23 +14,52 @@
 
     <div class="username-box ">
         <div class="box-inner">
-            <label for="username-input">Enter a username</label>
-            <form name="home-form" action="" method="POST">
+            <span class="alert-message">Email validation isn't required!</span>
+            <form name="create-form" action="" method="POST">
                 <div class="container">
-                    <button type='submit' class="go-button">Go!</button>
-                    <div class="input-container">
-                        <input placeholder="Enter a username..." id="username-input" name="username" required/>
+                    <div>
+                        <label for="username-input">Username:</label>
+                        <div class="input-container">
+                            <input placeholder="Enter a username..." id="username-input" name="username" required/>
 
+                        </div>
                     </div>
+
+                    <div>
+                        <label for="email-input">Email:</label>
+                        <div class="input-container">
+                            <input placeholder="Enter an email..." id="email-input" name="username" required/>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="password-input">Password:</label>
+                        <div class="input-container">
+                            <input placeholder="Enter a password..." id="password-input" name="username" required/>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="confirmPassword-input">Re-Type Password:</label>
+                        <div class="input-container">
+                            <input placeholder="Re-enter the password..." id="confirmPassword-input" name="username" required/>
+
+                        </div>
+                    </div>
+
+
 
 
                 </div>
 
-<!--                <div class="checkbox-wrapper-10">-->
-<!--                    <label class="label-text">save username ?</label>-->
-<!--                    <input class="tgl tgl-flip" id="cb5" type="checkbox" hidden/>-->
-<!--                    <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>-->
-<!--                </div>-->
+                <!--                <div class="checkbox-wrapper-10">-->
+                <!--                    <label class="label-text">save username ?</label>-->
+                <!--                    <input class="tgl tgl-flip" id="cb5" type="checkbox" hidden/>-->
+                <!--                    <label class="tgl-btn" data-tg-off="Nope" data-tg-on="Yeah!" for="cb5"></label>-->
+                <!--                </div>-->
+                                    <button type='submit' class="go-button">Go!</button>
 
             </form>
         </div>

@@ -29,16 +29,38 @@
     left: 50%;
 }
 
+form[name='create-form']{
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+}
+
 .home-main-section .username-box .box-inner {
     padding: 16px 16px;
     background-color: #e2e9f4;
     border-radius: 10px;
 }
 
-.home-main-section .username-box .box-inner .container {
-    display: flex;
+.home-main-section .username-box .box-inner span.alert-message{
+    margin: 0 auto 10px auto ;
+    width: fit-content;
+    display: block;
+    color: red;
+    font-weight: 700;
 }
 
+
+.home-main-section .username-box .box-inner .container {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-direction: column;
+}
+
+.home-main-section .username-box .box-inner .container + div{
+
+}
 /*.home-main-section .username-box .box-inner .container .go-button {*/
 /*    outline: none;*/
 /*    border: none;*/
@@ -56,7 +78,7 @@
 .go-button {
     align-items: center;
     appearance: none;
-    background-color: transparent;
+    background-color: #6ce382;
     border-width: 0;
     box-shadow: rgba(45, 35, 66, 0.4) 0 2px 4px, rgba(45, 35, 66, 0.3) 0 7px 13px -3px, #D6D6E7 0 -3px 0 inset;
     box-sizing: border-box;
@@ -100,11 +122,10 @@
     transform: translateY(2px);
 }
 
-.home-main-section .username-box .box-inner label[for='username-input'] {
+.home-main-section .username-box .box-inner label {
     font-family: "Hind", sans-serif;
     display: block;
     color: #3c4b66;
-    margin-bottom: 12px;
     background: linear-gradient(45deg, rgba(107, 123, 143, 1), #3c4b66);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;

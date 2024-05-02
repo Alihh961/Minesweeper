@@ -119,6 +119,7 @@ if (pageTitle === 'Minesweeper-Game') {
 
 }
 
+// Home Page
 if (pageTitle === 'Minesweeper-Home') {
 
     if (localStorage.getItem('username')) {
@@ -134,6 +135,10 @@ if (pageTitle === 'Minesweeper-Home') {
 
         // const username = document.querySelector('#username-input').value;
         const username = document.querySelector('#username-input').value;
+        const password = document.querySelector('#password-input').value;
+        const confirmedPassword = document.querySelector('#confirmPassword-input').value;
+        const email = document.querySelector('#email-input').value;
+
         // const checkBoxStatus  = document.querySelector('#cb5').checked;
         const checkBoxStatus = false;
 
@@ -154,6 +159,9 @@ if (pageTitle === 'Minesweeper-Home') {
                 },
                 body: JSON.stringify({
                     username ,
+                    email ,
+                    password,
+                    confirmedPassword,
                     save : checkBoxStatus
                 }),
             }).then(response => {
@@ -234,4 +242,11 @@ if (pageTitle === 'Minesweeper-Home') {
 
         }
     })
+}
+
+// Lobby Page
+if(pageTitle === 'Minesweeper-Lobby'){
+    let createGameBtn = document.querySelector('.create-game-btn');
+
+
 }

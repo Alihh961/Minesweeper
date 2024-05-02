@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const userRouter = require('./routes/UserRouter');
+let crypto = require('crypto');
 let MinesweeperGame = require('./classes/MinesweeperGame');
 
 const http = require('http');
@@ -89,7 +90,9 @@ app.get('/', (req, res) => {
 });
 
 app.use('/user', userRouter.router);
-app.use('/game', (req, res) => {
+app.post('/game', (req, res) => {
+
+
     res.render('game');
 });
 
