@@ -1,4 +1,9 @@
 <%- include('../index.ejs')%>
 
 
-<h2>Header Part</h2>
+<% if(user) { %>
+<h3>You are logged in as <%= user.userName %></h3>
+
+<a href="user/logout"> logout</a>
+
+<% } %>

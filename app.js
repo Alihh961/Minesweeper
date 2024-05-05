@@ -25,6 +25,7 @@ app.use('/home' , (req , res)=>{
 
 app.use('/user' , userRouter.router);
 app.use('/' , ( req , res)=>{
+
     res.render('lobby');
 });
 

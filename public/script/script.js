@@ -1,8 +1,12 @@
 console.log('Script js file works');
 
 let btn = document.createElement('button');
-btn.innerText  = 'click to send';
+btn.innerText = 'click to send';
+btn.classList.add('toto');
 document.body.appendChild(btn);
+btn.onclick = () => {
+
+}
 
 const pageTitle = document.querySelector('title').innerHTML;
 
@@ -20,13 +24,13 @@ if (pageTitle === 'Minesweeper-Game') {
     socket.on('disconnect', () => {
         console.log('disconnected from the server');
     });
-    socket.emit('sendMessageToAllUsers',{from : 'Ali', text: 'Hello MotherFuckers'});
+    socket.emit('sendMessageToAllUsers', {from: 'Ali', text: 'Hello MotherFuckers'});
 
-    socket.on('newMessage' , (data)=>{
+    socket.on('newMessage', (data) => {
         console.log(data);
     });
 
-    socket.on('newUserConnected' , (data)=>{
+    socket.on('newUserConnected', (data) => {
 
         const Toast = Swal.mixin({
             toast: true,
@@ -47,13 +51,13 @@ if (pageTitle === 'Minesweeper-Game') {
     })
 
 
-    btn.onclick = ()=>{
-
-        socket.emit('sendMessageToAllUsers' , {
-            text : 'Message sent to all users'
-        });
-
-    }
+    // btn.onclick = ()=>{
+    //
+    //     socket.emit('sendMessageToAllUsers' , {
+    //         text : 'Message sent to all users'
+    //     });
+    //
+    // }
 
 
     const squaresContainer = document.querySelector('.mines-container');
@@ -62,7 +66,7 @@ if (pageTitle === 'Minesweeper-Game') {
         var span = document.createElement('span');
 
         span.classList.add('square');
-        span.setAttribute('data-square' , `${i}`);
+        span.setAttribute('data-square', `${i}`);
 
         squaresContainer.appendChild(span);
     }
@@ -71,15 +75,13 @@ if (pageTitle === 'Minesweeper-Game') {
     var squares = document.querySelectorAll('.square');
 
 
-
-
     squares.forEach((square) => {
         square.addEventListener('click', (event) => {
             let clickedSquare = event.target;
             let id = clickedSquare.getAttribute('data-square');
             // Emit the squareClicked event to the server
             socket.emit('squareClicked', {
-                message: 'A square was clicked!' ,
+                message: 'A square was clicked!',
                 id
             });
 
@@ -90,31 +92,29 @@ if (pageTitle === 'Minesweeper-Game') {
     });
 
 
-    socket.on('receiveSquareContent', function(data) {
+    socket.on('receiveSquareContent', function (data) {
 
         let clickedSquare = document.querySelector(`[data-square="${data.id}"]`);
         let value = data.value;
 
-        if(clickedSquare){
-           if(typeof(value) === "number"){
-               clickedSquare.innerHTML = data.value;
+        if (clickedSquare) {
+            if (typeof (value) === "number") {
+                clickedSquare.innerHTML = data.value;
 
-           }else if(value === "-"){
-               clickedSquare.classList.add('mine');
-               clickedSquare.innerHTML = "\u26CC";
+            } else if (value === "-") {
+                clickedSquare.classList.add('mine');
+                clickedSquare.innerHTML = "\u26CC";
 
-           }else if(value === "+"){
-               clickedSquare.classList.add('heart');
-               clickedSquare.innerHTML = "\u2665";
+            } else if (value === "+") {
+                clickedSquare.classList.add('heart');
+                clickedSquare.innerHTML = "\u2665";
 
-           }else{
-               console.log("error")
-           }
+            } else {
+                console.log("error")
+            }
 
         }
     });
-
-
 
 
 }
@@ -130,6 +130,8 @@ if (pageTitle === 'Minesweeper-Home') {
 
     const goBtn = document.querySelector('.go-button');
 
+
+    // inscription form button
     goBtn.addEventListener('click', (event) => {
         event.preventDefault();
 
@@ -141,7 +143,6 @@ if (pageTitle === 'Minesweeper-Home') {
 
         // const checkBoxStatus  = document.querySelector('#cb5').checked;
         const checkBoxStatus = false;
-
 
 
         if (!username) {
@@ -158,11 +159,11 @@ if (pageTitle === 'Minesweeper-Home') {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    username ,
-                    email ,
+                    username,
+                    email,
                     password,
                     confirmedPassword,
-                    save : checkBoxStatus
+                    save: checkBoxStatus
                 }),
             }).then(response => {
                 if (!response.ok) {
@@ -185,7 +186,6 @@ if (pageTitle === 'Minesweeper-Home') {
                 }
 
 
-
                 // If response is OK, return the response JSON data
                 return response.json();
             }).then(data => {
@@ -197,7 +197,7 @@ if (pageTitle === 'Minesweeper-Home') {
                         localStorage.removeItem('username');
                     }
                     Swal.fire({
-                        title: `${username} , Are you ready to start?`,
+                        title: `Welcome ${username}, You can login now!`,
                         icon: 'success',
                         showConfirmButton: true,
                         confirmButtonText: "Lets Go!",
@@ -219,8 +219,7 @@ if (pageTitle === 'Minesweeper-Home') {
                         }
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = 'lobby';
-
+                            window.location.href = '/lobby';
                         }
                     });
                 } else if (data.code === 409 || 400) {
@@ -228,7 +227,8 @@ if (pageTitle === 'Minesweeper-Home') {
                     if (!checkBoxStatus) {
                         localStorage.removeItem('username');
 
-                    };
+                    }
+                    ;
                     Swal.fire({
                         icon: "error",
                         text: data.message,
@@ -251,11 +251,78 @@ if (pageTitle === 'Minesweeper-Home') {
                 })
 
         }
-    })
+    });
+
+
+    const loginBtn = document.querySelector('.login-button');
+
+    loginBtn.addEventListener('click', (event) => {
+
+        event.preventDefault();
+
+        const email = document.querySelector('#email').value;
+        const password = document.querySelector('#password').value;
+        const url = 'user/login';
+        fetch(url , {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+
+                email,
+                password,
+
+            }),
+        })
+            .then((response)=>{
+                if(!response.ok){
+                    console.log(error);
+                }
+
+                return response.json();
+            })
+            .then(data=>{
+                console.log(data.statusCode);
+                if(data.statusCode  === 401 || data.statusCode === 400  ){
+                    Swal.fire({
+                        icon : "error" ,
+                        title : data.message,
+                    })
+                }else if(data.statusCode == 200){
+                    Swal.fire( {
+                        icon :'success' ,
+                        title : 'Welcome' ,
+                        text : `${data.userName}, ready to go?`,
+                        showConfirmButton : true ,
+
+                    }).then(
+                        (result)=>{
+                            result.isConfirmed ? window.location.href = '/lobby' : null;
+                        }
+                    )
+
+                    console.log(data);
+                }else{
+                    Swal.fire({
+                        icon :'error',
+                        title : 'Unknown Error',
+                        text : 'Try again later'
+                    });
+                }
+
+            })
+            .catch(error=>{
+                console.log(error);
+            })
+
+    });
+
+
 }
 
 // Lobby Page
-if(pageTitle === 'Minesweeper-Lobby'){
+if (pageTitle === 'Minesweeper-Lobby') {
     let createGameBtn = document.querySelector('.create-game-btn');
 
 

@@ -1,9 +1,10 @@
 const express = require('express');
 const path = require('path');
 const userRouter = require('./routes/UserRouter');
-let crypto = require('crypto');
+const cookieParser = require('cookie-parser');
 let MinesweeperGame = require('./classes/MinesweeperGame');
 
+const {requireAuth, userIsAuthenticated} = require('./middleware/authMiddleware');
 const http = require('http');
 const socketIO = require('socket.io');
 
@@ -18,8 +19,16 @@ let io = socketIO(server);
 
 const port = process.env.PORT || 3000;
 const publicPath = path.join(__dirname, './public');
+
+
 app.set('view engine', 'ejs');
+
+//middlewares
 app.use(express.json()); //to add the request body sent of the api to the request body
+app.use(cookieParser());
+const {accessToLoginSignupPage} = require('./middleware/restrictUserAccessMiddleware');
+
+
 app.use(express.static(publicPath)); // to have the access to static files in the browser
 app.use(express.urlencoded({extended: true})); // to receive data using post method
 
@@ -81,11 +90,15 @@ io.on('connection', (socket) => {
 });
 
 
+
 server.listen(port || 3000, () => {
     console.log('Server connected');
 })
 
-app.get('/', (req, res) => {
+
+app.get('*' , userIsAuthenticated);
+app.get('/',accessToLoginSignupPage ,(req, res) => {
+
     res.render('home' );
 });
 
@@ -96,9 +109,20 @@ app.post('/game', (req, res) => {
     res.render('game');
 });
 
-app.use('/lobby', (req, res) => {
+app.use('/lobby', requireAuth ,  (req, res) => {
     res.render('lobby');
 });
+
+app.get('/set-cookies' , (req, res)=>{
+    res.cookie('newUser' ,false , {maxAge:1000 * 60 * 60 * 24 ,secure : true }); // secure will be set only with secured connections
+    res.send('new USer');
+});
+
+app.get('/get-cookies',  (req , res )=>{
+    const cookies = req.cookies;
+
+    res.json(cookies);
+})
 
 
 module.exports = server;

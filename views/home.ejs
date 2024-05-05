@@ -36,7 +36,7 @@
                     <div>
                         <label for="password-input">Password:</label>
                         <div class="input-container">
-                            <input placeholder="Enter a password..." id="password-input" name="password" type="password "required/>
+                            <input placeholder="Enter a password..." id="password-input" name="password" type="password" required/>
 
                         </div>
                     </div>
@@ -47,7 +47,6 @@
                             <input placeholder="Re-enter the password..." id="confirmPassword-input"
                                    name="confirmPassword" type="password"
                                    required/>
-
                         </div>
                     </div>
 
@@ -70,11 +69,11 @@
         </div>
         <p class="">Login</p>
 
-        <form name="login-form" action="user/login" method="POST">
+        <form name="login-form"  method="POST">
             <div>
                 <label for="email-input">Email:</label>
                 <div class="input-container">
-                    <input placeholder="Enter your email..." id="email-input" name="email" required/>
+                    <input placeholder="Enter your email..." id="email" name="email" required/>
 
                 </div>
             </div>
@@ -82,10 +81,11 @@
             <div>
                 <label for="email-input">Password:</label>
                 <div class="input-container">
-                    <input placeholder="Enter the password..." id="password-input" name="password" type="password" required/>
-
+                    <input placeholder="Enter the password..." id="password" name="password" type="password" required/>
                 </div>
             </div>
+
+            <button class="login-button">Login</button>
         </form>
     </div>
 

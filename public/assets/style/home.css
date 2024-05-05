@@ -81,7 +81,7 @@ form[name='create-form'] {
 /*    cursor: pointer;*/
 /*}*/
 
-.go-button {
+.go-button , .login-button {
     align-items: center;
     appearance: none;
     background-color: #6ce382;
@@ -92,6 +92,7 @@ form[name='create-form'] {
     cursor: pointer;
     display: inline-flex;
     font-family: "Hind", sans-serif;
+    width: 100%;
     min-width: 46px;
     min-height: 46px;
     border-radius: 10px;
@@ -372,3 +373,7 @@ form[name='login-form'] > div {
     margin-bottom: 15px;
 }
 
+.toto{
+    position: absolute;
+    z-index: 99;
+}

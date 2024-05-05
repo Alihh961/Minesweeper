@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const userModel = require('../models/UserModel');
 
 
-const signup = async ( req, res ,next ) => {
+const signup = async (req, res, next) => {
 
     const userName = req.body.username;
     const email = req.body.email;
@@ -19,23 +19,23 @@ const signup = async ( req, res ,next ) => {
 
         if (usernameExists) {
 
-            throw { message: 'Username already exists', statusCode: 409 };
+            throw {message: 'Username already exists', statusCode: 409};
 
         }
-        const emailExists = await userModel.findOne({email :email});
+        const emailExists = await userModel.findOne({email: email});
 
         if (emailExists) {
 
-            throw { message: 'Email already exists', statusCode: 409 };
+            throw {message: 'Email already exists', statusCode: 409};
 
 
         }
-        if(password !== confirmedPassword){
-            throw { message: "Passwords don't match", statusCode: 400 };
+        if (password !== confirmedPassword) {
+            throw {message: "Passwords don't match", statusCode: 400};
 
         }
-        if(password.length < 8){
-            throw { message: "Password Error: 8 letters at least", statusCode: 400 };
+        if (password.length < 8) {
+            throw {message: "Password Error: 8 letters at least", statusCode: 400};
 
         }
         const newUser = new userModel({
@@ -50,31 +50,30 @@ const signup = async ( req, res ,next ) => {
 
     } catch (error) {
 
-        return res.json({ message : error.message , code : error.statusCode });
+        return res.json({message: error.message, code: error.statusCode});
     }
 
 
 };
 
-const login = async(req , res)=>{
+const login = async (req, res) => {
 
     const email = req.body.email;
     const password = req.body.password;
 
 
-
-    try{
+    try {
         var user = await userModel.findOne({email}).select('+password');
 
 
         if (!email || !password) {
-            throw ({message : 'Please provide an email and password!', statusCode : 400});
+            throw ({message: 'Please provide an email and password!', statusCode: 400});
 
         }
 
 
-        if(!user || !await user.comparingPasswordInDB(password , user.password) ){
-            throw ({message : 'Invalid credentials', statusCode : 401});
+        if (!user || !await user.comparingPasswordInDB(password, user.password)) {
+            throw ({message: 'Invalid credentials', statusCode: 401});
 
         }
 
@@ -84,34 +83,44 @@ const login = async(req , res)=>{
 
         const token = signToken(user._id);
 
+        // httpOnly means that the user can't access the cookie from the browser like the console
+        res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000}) // * 1000 because in the cookie it is treated in milliseconds
 
+        // res.redirect('/lobby');
         return res.status(200).json({
             status: 'success',
-            token,
-            user
+            statusCode : 200 ,
+            userId : user._id ,
+            userName : user.userName
         });
 
 
-    }
+    } catch (error) {
 
-    catch (error){
-
-        return res.json({message : error.message , statusCode : error.statusCode});
+        return res.json({message: error.message, statusCode: error.statusCode});
 
     }
 
 
 };
 
+const logout = (req , res)=>{
+    res.cookie('jwt' , '' , {maxAge : 1});
+    res.redirect('/');
+};
+
+
+
+const maxAge = 3 * 24 * 60 * 60;
 
 const signToken = function (id) {
     return jwt.sign(
-        { id } /* payload*/,
+        {id} /* payload*/,
         process.env.SECRET_STR /* secret string */,
         {
-            expiresIn: process.env.LOGIN_EXPIRES /* expire date */,
+            expiresIn: maxAge /* expire date */,
         }
     );
 };
 
-module.exports = { signup , login};
+module.exports = {signup, login , logout};
