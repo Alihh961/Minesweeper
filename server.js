@@ -40,63 +40,74 @@ mongoose.connect(`${process.env.DATABASE_URI}/Minesweeper`).then((conn) => {
     console.log(err);
 });
 
-
-// const server = app.listen(port , ()=>{
-//     console.log(`Server started at port : ${port}`);
-// });
+let games = [];
 
 
 io.on('connection', (socket) => {
 
-    let game = new MinesweeperGame();
-
-
-    socket.broadcast.emit('newUserConnected' ,{
-        message : 'New user is connected'
-    } );
-
-    socket.on('disconnect', () => {
-        console.log('User disconnected');
-    });
+    function getGameById(gameId) {
+        for (let game of games) { // using return with forEach will exit the forEach and not the whole function
+            if (game.id == gameId) {
+                return game;
+            }
+        }
+        return 0;
+    }
 
     socket.on('squareClicked', (data) => {
-        let id = data.id;
-        const value = game.returnThenRemoveAnObject(id);
+        let squareId = data.squareId;
+        let gameId = data.gameId;
+        let value ;
+        let currentGame ;
+
+        games.forEach(game=>{
+            if(game.id == gameId){
+                value = game.returnThenRemoveAnObject(squareId);
+                currentGame = game;
+            }
+        });
 
         socket.emit('receiveSquareContent', {
             value,
-            id
+            squareId,
+            currentGame
         });
 
     });
 
-    // socket.emit('newMessage', {
-    //     text: 'new message',
-    //     sender: 'toto'
-    // });
-    socket.on('sendMessageToAllUsers', (data) => {
-        // io.emit('newMessage' , { // broadcasting to all connected users even the user who did the event
-        //     message : data.text
-        // });
-
-        socket.broadcast.emit('newMessage', { // broadcasting to all connected users except the one who did the event
-
-            message: data.text,
-            from:data.from,
+    socket.on('getAllGames',()=>{
+        socket.emit('receivingAllGames',{
+            games
         })
     });
+
+    socket.on('getGameById' , (data)=>{
+
+        const currentGame = getGameById(data.id);
+
+        socket.emit('setGameById' , {
+            game : currentGame
+        })
+    })
+
+    socket.on('closeGame' , ()=>{
+
+    })
+
+
 
 
 });
 
 
 
-server.listen(port || 3000, () => {
+server.listen(port , () => {
+    console.log(port);
     console.log('Server connected');
 })
 
-
-app.get('*' , userIsAuthenticated);
+// inject the middleware for all request , the middleware will check if the token is valid then pass the user
+app.use(userIsAuthenticated);
 app.get('/',accessToLoginSignupPage ,(req, res) => {
 
     res.render('home' );
@@ -105,11 +116,41 @@ app.get('/',accessToLoginSignupPage ,(req, res) => {
 app.use('/user', userRouter.router);
 app.post('/game', (req, res) => {
 
+const creator = req.body.creator ? req.body.creator : null;
+const player = req.body.player ? req.body.player : null;
+const gameId = req.body.gameId;
 
-    res.render('game');
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const xCreator = urlParams.get('creator');
+
+
+    if(!creator){
+        res.redirect('game?gameId='+player);
+    }
+
+games.forEach(game=>{
+    if(game.creator === creator){
+        res.json({'Error' : 'A game already exists for the player ' + creator})
+    }
+
+});
+var game = new MinesweeperGame();
+
+game._setCreator(creator);
+
+games.push(game);
+
+    res.render('game' , { gameId : game.id , creator});
 });
 
+
+app.get('/game-join' , (req ,res)=>{
+
+    let gameId = req.body.gameId;
+    res.render('game' , {gameId});
+})
 app.use('/lobby', requireAuth ,  (req, res) => {
+
     res.render('lobby');
 });
 
@@ -123,6 +164,8 @@ app.get('/get-cookies',  (req , res )=>{
 
     res.json(cookies);
 })
+
+
 
 
 module.exports = server;

@@ -1,6 +1,7 @@
 @import "game.css";
 @import "header.css";
 @import "home.css";
+@import "lobby.css";
 
 *{
     padding: 0;
