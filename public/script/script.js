@@ -1,18 +1,13 @@
 console.log('Script js file works');
 
-let btn = document.createElement('button');
-btn.innerText = 'click to send';
-btn.classList.add('toto');
-document.body.appendChild(btn);
-btn.onclick = () => {
 
-}
 
 const pageTitle = document.querySelector('title').innerHTML;
 
 console.log(pageTitle);
 // Game Page
 if (pageTitle === 'Minesweeper-Game') {
+
 
 
     const squaresContainer = document.querySelector('.mines-container');

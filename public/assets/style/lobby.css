@@ -18,6 +18,7 @@ h4.form-join{
     font-style: italic;
     color: rgb(128, 128, 128);
     font-family: serif;
+    text-align: center;
 }
 
 .game-join-button{
