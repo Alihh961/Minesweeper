@@ -1,10 +1,14 @@
 let socket = io();
-
-
+const loggedUser = document.querySelector("input[name='loggedUser']").value;
+const gamesListContainer = document.querySelector('.games-list');
+let allGames;
+document.querySelector('.coucou').addEventListener('click' , ()=>{
+    socket.emit('allGames');
+})
 
 const gameId = document.querySelector('.game-id-hidden') ? document.querySelector('.game-id-hidden') : null;
 
-if(gameId){
+if (gameId) {
     socket.emit('getGameById', {
         id: gameId
     });
@@ -14,26 +18,24 @@ if(gameId){
 socket.on('connect', () => {
 });
 
+
 socket.on('disconnect', () => {
     console.log('disconnected from the server');
 });
 
 
 
+socket.emit('getAllGames', {
 
-
-
-const gamesListContainer = document.querySelector('.games-list');
-
-socket.emit('getAllGames', {}
+    }
 );
 
 socket.on('receivingAllGames', (data) => {
-    const games = data.games;
+    allGames = data.games;
     if (gamesListContainer) {
 
-        if (games && games.length > 0) {
-            updateGamesList(games, gamesListContainer);
+        if (allGames && allGames.length > 0) {
+            updateGamesList(allGames, gamesListContainer);
 
         } else {
             updateGamesList(null, gamesListContainer);
@@ -47,36 +49,61 @@ socket.on('receivingAllGames', (data) => {
 function updateGamesList(games, gamesListContainer) {
 
     if (games && games.length > 0) {
+        gamesListContainer.innerHTML = '';
         games.forEach(game => {
             const form = document.createElement('form');
-            form.setAttribute('method', 'GET');
-            form.setAttribute('action', 'game-join');
+            form.setAttribute('method', 'POST');
+            form.setAttribute('action', 'game');
             form.classList.add('form-join');
 
-            const input = document.createElement('input');
-            input.setAttribute('type', 'hidden');
-            input.setAttribute('name', 'gameId');
+            const inputUser = document.createElement('input');
+            inputUser.setAttribute('type', 'hidden');
+            inputUser.setAttribute('name', 'joiner');
+            inputUser.setAttribute('value', loggedUser);
 
-            input.setAttribute('value', game.id);
+            const inputGameId = document.createElement('input');
+            inputGameId.setAttribute('type', 'hidden');
+            inputGameId.setAttribute('name', 'gameId');
+            inputGameId.setAttribute('value', game.id);
+
 
             const button = document.createElement('button');
             button.setAttribute('type', 'submit');
             button.innerText = `${game.creator}'s game`;
-            button.setAttribute('id', game.id);
             button.classList.add('game-join-button');
+            console.log(game);
 
+            if(game.closed){
+                button.classList.add('closed');
+
+            }
+
+            form.appendChild(inputUser);
+            form.appendChild(inputGameId);
             form.appendChild(button);
+
 
             gamesListContainer.appendChild(form);
 
 
         })
     } else {
+        gamesListContainer.innerHTML = '';
 
         let message = document.createElement('h4');
         message.textContent = 'No games to show';
         message.classList.add('form-join');
 
         gamesListContainer.appendChild(message);
+
     }
 }
+
+// joining a game
+
+
+
+
+
+
+

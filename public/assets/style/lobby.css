@@ -27,6 +27,32 @@ h4.form-join{
     padding: 5px;
     width: 100%;
     text-align: start;
+    position: relative;
+}
+
+.game-join-button:before{
+    font-family: "Font Awesome 5 Free";
+    content: "\f3c1";
+    display: inline-block;
+    padding-right: 3px;
+    vertical-align: middle;
+    font-weight: 900;
+    position: absolute;
+    width: fit-content;
+    right: 15px;
+}
+
+
+.game-join-button.closed:before{
+    font-family: "Font Awesome 5 Free";
+    content: "\f023";
+    display: inline-block;
+    padding-right: 3px;
+    vertical-align: middle;
+    font-weight: 900;
+    position: absolute;
+    width: fit-content;
+    right: 15px;
 }
 
 .game-join-button:hover {

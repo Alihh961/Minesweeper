@@ -8,12 +8,29 @@
 
 
 <section class="game-main-section">
+    <div class="players-info">
+        <h4 class="opp-lives">Opp lives: <span></span></h4>
+        <h4 class="opp-score">Your score: <span></span></h4>
+
+    </div>
     <div class="mines-container">
 
     </div>
-</section>
 
-<button class="hoho">Click</button>
+
+    <div class="players-info">
+        <h4 class="your-lives">Your lives: <span></span></h4>
+        <h4 class="your-score">Your score: <span></span></h4>
+
+
+    </div>
+</section>
+<input type="hidden" value="<%= creator %>" name="creator"/>
+<input type="hidden" value="<%= joiner %>" name="joiner"/>
+<input type="hidden" value="<%= gameId %>" name="gameId"/>
+<input type="hidden" value="<%= hashedPlayerType %>" name="hashedPlayerType"/>
+
+
 
 <script src="script/game.js" defer></script>
 

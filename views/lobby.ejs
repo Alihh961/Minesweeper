@@ -12,21 +12,15 @@
 
 </div>
 
-    <form class='game-form' action="/game" method="GET">
+    <form class='game-form' action="/game" method="POST">
         <input type="hidden" value="<%= user.userName %>" name="creator" >
-        <input type="hidden" value="123" name="gameId" >
-
         <button Type="submit" onclick="" class="create-game-btn">Create a game</button>
 
     </form>
 
-    <form class='game-form' action="/game" method="GET">
-        <input type="hidden" value="toto" name="joiner" >
-        <input type="hidden" value="123" name="gameId" >
-
-        <button Type="submit" onclick="" class="create-game-btn">Join a game</button>
-
-    </form>
 </section>
+
+<button class="coucou">click</button>
+
 
 <script src="script/lobby.js" defer></script>

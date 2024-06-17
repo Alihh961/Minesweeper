@@ -1,6 +1,18 @@
 .game-main-section {
     margin: 50px 0 0 0;
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+}
+
+.game-main-section .players-info{
+    width: 253px;
+    background: white;
+    padding: 10px;
+    border-radius: 5px;
 }
 
 .game-main-section .mines-container {
@@ -46,4 +58,8 @@
     border: solid #222222;
     border-width: 0 1px 1px 0;
     pointer-events: none;
+}
+
+.game-main-section .mines-container span.square.opened.joiner {
+    background-color: #d88484!important;
 }

@@ -3,6 +3,8 @@ const path = require('path');
 const userRouter = require('./routes/UserRouter');
 const cookieParser = require('cookie-parser');
 let MinesweeperGame = require('./classes/MinesweeperGame');
+const functions = require('./public/utils/functions');
+const bcrypt = require('bcryptjs');
 
 const {requireAuth, userIsAuthenticated} = require('./middleware/authMiddleware');
 const http = require('http');
@@ -45,84 +47,122 @@ let games = [];
 
 io.on('connection', (socket) => {
 
-    socket.on('test', (data) => {
-        if (io.sockets.adapter.rooms.has(data.id)) {
-            io.to(data.id).emit('message', 'content for room 123');
-            console.log('Message sent to room 123');
-        } else {
-            console.log('Room 123 does not exist');
-            // Optionally emit an event or handle the absence of the room
-        }
-    });
-
-
-    socket.on('createAGame', (creatorObject)=>{
+    socket.on('createAGame', (creatorObject) => {
         let gameExists = false;
         games.forEach(game => {
             if (game.creator === creatorObject.creator) {
                 gameExists = true;
-                socket.emit('errorCreatingGame' , {
-                    message : 'A game exists already for ' + creatorObject.creator
+                socket.emit('errorCreatingGame', {
+                    message: 'A game exists already for ' + creatorObject.creator
                 })
             }
         });
 
-        if(!gameExists){
+        if (!gameExists) {
             var game = new MinesweeperGame();
-            game._setCreator(creatorObject.creator);
+            game.creator = creatorObject.creator;
             games.push(game);
             socket.join(game.id);
-            socket.emit('gameCreatedSuccessfully' , {
-                message : 'Game created successfully' ,
+            console.log(game);
+            socket.emit('gameCreatedSuccessfully', {
+                message: 'Game created successfully',
                 game
             });
-
+            io.emit('receivingAllGames', {
+                games
+            });
 
         }
 
 
     });
 
-    socket.on('join' , (data)=>{
 
+    socket.on('join', (data) => {
+
+        // room game
         const game = io.sockets.adapter.rooms.get(data.gameId);
 
-        if(game && game.size == 1 ){
-            socket.join(data.gameId);
-            socket.emit('gameJoinedSuccessfully' , {
-                gameId : data.gameId
-            })
+        let errorMessage;
+
+        if (game) {
+            // object Minesweeper game
+            let currentGame = getGameById(data.gameId);
+            if (currentGame.creator === data.joiner) {
+                errorMessage = `You can't join your game!`;
+
+            } else {
+                if (game.size === 1 && !game.closed) {
+                    socket.join(data.gameId);
+                    currentGame.closed = true;
+                    currentGame.joiner = (data.joiner);
+                    socket.emit('gameJoinedSuccessfully', {
+                        gameId: data.gameId
+                    });
+
+                } else if (currentGame.closed) {
+                    errorMessage = 'The game is closed ';
+                } else {
+                    errorMessage = 'Unjoinable game ';
+
+                }
+            }
+
+
+        } else {
+            errorMessage = 'No Game Found';
         }
+        if (errorMessage) {
+            socket.emit('errorJoiningAGame', {
+                errorMessage
+            });
+
+        }
+
     });
+
     function getGameById(gameId) {
         for (let game of games) { // using return with forEach will exit the forEach and not the whole function
-            if (game.id == gameId) {
+            if (game.id === gameId) {
                 return game;
             }
         }
         return 0;
-    }
+    };
 
-    socket.on('squareClicked', (data) => {
+    socket.on('allGames', () => {
+        console.log(games);
+    })
+
+    socket.on('squareClicked', async (data) => {
         let squareId = data.squareId;
         let gameId = data.gameId;
         let value;
         let currentGame;
+        const hashedPlayerType = data.hashedPlayerType;
+        const clickedByJoiner = await bcrypt.compare('joiner' , hashedPlayerType);
+        var clicker;
 
+        if(clickedByJoiner){
+            clicker = 'joiner';
+        }else{
+            clicker = 'creator';
+
+        }
         games.forEach(game => {
             if (game.id == gameId) {
-                value = game.returnThenRemoveAnObject(squareId);
+                value = game.returnThenRemoveAnObject(squareId ,clicker);
                 currentGame = game;
             }
 
 
         });
 
-        io.to(data.gameId).emit('receiveSquareContent',{
+        io.to(data.gameId).emit('receiveSquareContent', {
             value,
             squareId,
             currentGame
-        } );
+        });
 
 
     });
@@ -142,9 +182,32 @@ io.on('connection', (socket) => {
         })
     })
 
-    socket.on('closeGame', () => {
+    socket.on('closeGame', (data) => {
+
+        closeAGame(data.gameId);
+
+        io.emit('receivingAllGames', {
+            games
+        });
+        if(!data.noMoreLives){
+
+            io.to(data.gameId).emit('gameIsClosed', {
+                message: 'You won, Your opponent left the game!'
+            });
+        }
+
+
 
     })
+
+    function closeAGame(id) {
+
+        const index = games.findIndex(game => game.id === id);
+
+        if (index !== -1) {
+            games.splice(index, 1);
+        }
+    }
 
 
 });
@@ -163,38 +226,37 @@ app.get('/', accessToLoginSignupPage, (req, res) => {
 });
 
 app.use('/user', userRouter.router);
-app.get('/game', (req, res) => {
+app.post('/game', async (req, res) => {
 
-    const creator = req.query.creator ? req.query.creator : null;
-    const joiner = req.query.joiner ? req.query.joiner : null;
-    const gameId = req.query.gameId;
+    const creator = req.body.creator ? req.body.creator : null;
+    const joiner = req.body.joiner ? req.body.joiner : null;
+    const gameId = req.body.gameId;
+
+    const saltRounds = 10;
+    var hashedPlayerType ;
 
 
-    // const urlParams = new URLSearchParams(window.location.search);
-    // const xCreator = urlParams.get('creator');
+
 
 
     if (joiner) {
         let gameToJoin = games.find(game => game.id === gameId);
+        hashedPlayerType = await bcrypt.hash('joiner' , saltRounds);
+        console.log('joiner joined');
+        if (!gameToJoin) {
 
-        if (!gameToJoin){
-
-            return res.json({ 'Error': 'No game found with the provided ID' });
+            return res.json({'Error': 'No game found with the provided ID'});
         }
+    }else{
+        console.log('creator created a game')
+        hashedPlayerType = await bcrypt.hash('creator' , saltRounds);
+
     }
 
-
-
-
-    res.render('game');
+    res.render('game', {creator, joiner, gameId , hashedPlayerType });
 });
 
 
-app.get('/game-join', (req, res) => {
-
-    let gameId = req.body.gameId;
-    res.render('game', {gameId});
-})
 app.use('/lobby', requireAuth, (req, res) => {
 
     res.render('lobby');

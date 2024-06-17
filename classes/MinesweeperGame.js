@@ -5,13 +5,16 @@ class MinesweeperGame {
         this.objects = this._generateObjects();
         this.creator ;
         this.creatorScore = 0;
-        this.creatorLifes = 3;
-        this.player ;
+        this.creatorLives = 3;
+        this.joiner ;
+        this.joinerScore = 0;
+        this.joinerLives = 3;
         this.id = this.generateUUIDv4();
         this.removedValues = [];
+        this.closed = false;
     }
 
-    _setCreator(name){
+    setCreator(name){
         this.creator = name;
     }
 
@@ -19,18 +22,18 @@ class MinesweeperGame {
         return this.creator;
     }
 
-    _setPlayer(name){
-        this.player = name;
+    setJoiner(name){
+        this.joiner = name;
     }
 
-    getPlayer(){
-        return this.player;
+    getJoiner(){
+        return this.joiner;
     }
 
     _generateObjects() {
 
         const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
-        const lifes = "+";
+        const lives = "+";
         const mines = "-";
 
         var arrayOfObjects = [];
@@ -40,7 +43,7 @@ class MinesweeperGame {
         }
 
         for (let i = 0; i < 5; i++) {
-            arrayOfObjects.push(lifes);
+            arrayOfObjects.push(lives);
         }
 
         for (let i = 0; i < 25; i++) {
@@ -65,7 +68,7 @@ class MinesweeperGame {
         return this.objects;
     }
 
-    returnThenRemoveAnObject(index){
+    returnThenRemoveAnObject(index , player){
 
 
         const randomValue = this.getObjects()[index];
@@ -74,12 +77,31 @@ class MinesweeperGame {
         this.removedValues.push({value : randomValue , squareId : index});
 
         if(randomValue == '-'){
-            this.creatorLifes -= 1;
+
+            if(player === 'creator'){
+                this.creatorLives -= 1;
+
+            }else{
+                this.joinerLives -= 1;
+
+            }
         }else if(randomValue == '+'){
 
-            this.creatorLifes += 1;
+            if(player === 'creator'){
+                this.creatorLives += 1;
+
+            }else{
+                this.joinerLives += 1;
+
+            }
         }else{
-            this.creatorScore += randomValue;
+            if(player === 'creator'){
+                this.creatorScore += randomValue;
+
+            }else{
+                this.joinerScore += randomValue;
+
+            }
         }
 
 
