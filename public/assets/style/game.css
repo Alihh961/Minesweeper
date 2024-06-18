@@ -13,6 +13,18 @@
     background: white;
     padding: 10px;
     border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+}
+
+.game-main-section .players-info h4.time{
+
+}
+
+.game-main-section .players-info h4.time.alert{
+
+    color: red;
 }
 
 .game-main-section .mines-container {

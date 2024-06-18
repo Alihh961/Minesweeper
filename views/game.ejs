@@ -9,8 +9,14 @@
 
 <section class="game-main-section">
     <div class="players-info">
-        <h4 class="opp-lives">Opp lives: <span></span></h4>
-        <h4 class="opp-score">Your score: <span></span></h4>
+
+        <div>
+            <h4 class="opp-lives">Opp lives: <span></span></h4>
+            <h4 class="opp-score">Opp score: <span></span></h4>
+        </div>
+
+        <h4 class="opp-time time"></h4>
+
 
     </div>
     <div class="mines-container">
@@ -19,8 +25,12 @@
 
 
     <div class="players-info">
-        <h4 class="your-lives">Your lives: <span></span></h4>
-        <h4 class="your-score">Your score: <span></span></h4>
+        <div>
+            <h4 class="your-lives">Your lives: <span></span></h4>
+            <h4 class="your-score">Your score: <span></span></h4>
+        </div>
+
+        <h4 class="your-time time"></h4>
 
 
     </div>
@@ -30,7 +40,8 @@
 <input type="hidden" value="<%= gameId %>" name="gameId"/>
 <input type="hidden" value="<%= hashedPlayerType %>" name="hashedPlayerType"/>
 
-
+<button class="start">start</button>
+<button class="stop">stop</button>
 
 <script src="script/game.js" defer></script>
 

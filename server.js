@@ -63,7 +63,6 @@ io.on('connection', (socket) => {
             game.creator = creatorObject.creator;
             games.push(game);
             socket.join(game.id);
-            console.log(game);
             socket.emit('gameCreatedSuccessfully', {
                 message: 'Game created successfully',
                 game
@@ -76,6 +75,41 @@ io.on('connection', (socket) => {
 
 
     });
+
+    socket.on('updateTime' , (data)=>{
+        let game = getGameById(data.gameId);
+        let player = data.player;
+
+        if(data.deduct){
+
+            if(player === 'creator'){
+                game.creatorTime -= 1;
+                if(game.creatorTime >= 0){
+                    socket.emit('ranOfTime' , {
+                        message : 'Ran of time',
+                        player : 'creator'
+                    })
+                }
+            }else if(player === 'joiner'){
+                game.joinerTime -= 1;
+                if(game.joinerTime >= 0){
+                    socket.emit('ranOfTime' , {
+                        message : 'Ran of time',
+                        player : 'creator'
+                    })
+                }
+            }
+
+        }
+
+
+
+    io.to(data.gameId).emit('updateGameInfo' , {
+        game
+    })
+
+    });
+
 
 
     socket.on('join', (data) => {
@@ -97,7 +131,7 @@ io.on('connection', (socket) => {
                     currentGame.closed = true;
                     currentGame.joiner = (data.joiner);
                     socket.emit('gameJoinedSuccessfully', {
-                        gameId: data.gameId
+                        game: currentGame
                     });
 
                 } else if (currentGame.closed) {
@@ -130,9 +164,6 @@ io.on('connection', (socket) => {
         return 0;
     };
 
-    socket.on('allGames', () => {
-        console.log(games);
-    })
 
     socket.on('squareClicked', async (data) => {
         let squareId = data.squareId;
@@ -189,11 +220,15 @@ io.on('connection', (socket) => {
         io.emit('receivingAllGames', {
             games
         });
-        if(!data.noMoreLives){
+
+
+        if(!data.noMoreLives && data.refreshed ){
 
             io.to(data.gameId).emit('gameIsClosed', {
-                message: 'You won, Your opponent left the game!'
+                message: 'You won, Your opponent left the game!',
+                player : data.player
             });
+
         }
 
 
@@ -242,13 +277,12 @@ app.post('/game', async (req, res) => {
     if (joiner) {
         let gameToJoin = games.find(game => game.id === gameId);
         hashedPlayerType = await bcrypt.hash('joiner' , saltRounds);
-        console.log('joiner joined');
         if (!gameToJoin) {
 
             return res.json({'Error': 'No game found with the provided ID'});
         }
     }else{
-        console.log('creator created a game')
+
         hashedPlayerType = await bcrypt.hash('creator' , saltRounds);
 
     }
