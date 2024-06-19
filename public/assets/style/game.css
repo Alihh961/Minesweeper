@@ -18,11 +18,11 @@
     justify-content: space-around;
 }
 
-.game-main-section .players-info h4.time{
+.game-main-section .players-info h4.clicks-left{
 
 }
 
-.game-main-section .players-info h4.time.alert{
+.game-main-section .players-info h4.clicks-left.alert{
 
     color: red;
 }

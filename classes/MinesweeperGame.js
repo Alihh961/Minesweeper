@@ -6,11 +6,11 @@ class MinesweeperGame {
         this.creator ;
         this.creatorScore = 0;
         this.creatorLives = 3;
-        this.creatorTime = 200;
+        this.creatorClicksLeft = 2 ;
         this.joiner ;
         this.joinerScore = 0;
         this.joinerLives = 3;
-        this.joinerTime = 200;
+        this.joinerClicksLeft = 15;
         this.id = this.generateUUIDv4();
         this.removedValues = [];
         this.closed = false;

@@ -42,6 +42,8 @@ mongoose.connect(`${process.env.DATABASE_URI}/Minesweeper`).then((conn) => {
     console.log(err);
 });
 
+
+
 let games = [];
 
 
@@ -76,25 +78,27 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('updateTime' , (data)=>{
+    socket.on('updateClicksLeft' , (data)=>{
+
         let game = getGameById(data.gameId);
         let player = data.player;
 
         if(data.deduct){
 
             if(player === 'creator'){
-                game.creatorTime -= 1;
-                if(game.creatorTime >= 0){
-                    socket.emit('ranOfTime' , {
-                        message : 'Ran of time',
+                game.creatorClicksLeft -= 1;
+                console.log('here' , game.creatorClicksLeft);
+                if(game.creatorClicksLeft <= 0){
+                    socket.emit('ranOfClicks' , {
+                        message : 'No more clicks',
                         player : 'creator'
                     })
                 }
             }else if(player === 'joiner'){
-                game.joinerTime -= 1;
-                if(game.joinerTime >= 0){
-                    socket.emit('ranOfTime' , {
-                        message : 'Ran of time',
+                game.joinerClicksLeft -= 1;
+                if(game.joinerClicksLeft <= 0){
+                    socket.emit('ranOfClicks' , {
+                        message : 'No more clicks',
                         player : 'creator'
                     })
                 }
@@ -162,7 +166,7 @@ io.on('connection', (socket) => {
             }
         }
         return 0;
-    };
+    }
 
 
     socket.on('squareClicked', async (data) => {
@@ -217,6 +221,7 @@ io.on('connection', (socket) => {
 
         closeAGame(data.gameId);
 
+        io.leave(data.gameId);
         io.emit('receivingAllGames', {
             games
         });

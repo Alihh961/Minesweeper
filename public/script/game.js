@@ -68,12 +68,16 @@ if (squares) {
 
             });
 
+            changeClicksLeft(window.player.type);
+
 
         });
     });
 }
 
 socket.on('receiveSquareContent', function (data) {
+
+
 
 
     const creatorLives = data.currentGame.creatorLives;
@@ -300,14 +304,16 @@ socket.on('updateGameInfo', (data) => {
 
 })
 
+socket.on('ranOfClicks')
+
 
 function updatePlayersInfo(game) {
     const creatorLives = game.creatorLives;
     const joinerLives = game.joinerLives;
     const creatorScore = game.creatorScore;
     const joinerScore = game.joinerScore;
-    const creatorTime = editTimeValue(':', game.creatorTime.toString().padStart(3, '0'));
-    const joinerTime = editTimeValue(':', game.joinerTime.toString().padStart(3, '0'));
+    const creatorClicksLeft = game.creatorClicksLeft;
+    const joinerClicksLeft = game.joinerClicksLeft;
 
 
     if (window.player.type === 'joiner') {
@@ -315,8 +321,8 @@ function updatePlayersInfo(game) {
         document.querySelector('.your-score span').textContent = joinerScore;
         document.querySelector('.opp-lives span').textContent = creatorLives;
         document.querySelector('.opp-score span').textContent = creatorScore;
-        document.querySelector('.opp-time').textContent = creatorTime;
-        document.querySelector('.your-time').textContent = joinerTime;
+        document.querySelector('.opp-clicks-left').textContent = creatorClicksLeft;
+        document.querySelector('.your-clicks-left').textContent = joinerClicksLeft;
 
 
     } else if (window.player.type === 'creator') {
@@ -325,8 +331,8 @@ function updatePlayersInfo(game) {
         document.querySelector('.your-score span').textContent = creatorScore;
         document.querySelector('.opp-lives span').textContent = joinerLives;
         document.querySelector('.opp-score span').textContent = joinerScore;
-        document.querySelector('.opp-time').textContent = joinerTime;
-        document.querySelector('.your-time').textContent = creatorTime;
+        document.querySelector('.opp-clicks-left').textContent = joinerClicksLeft;
+        document.querySelector('.your-clicks-left').textContent = creatorClicksLeft;
 
     } else {
         console.log('Error updating lives and scores');
@@ -335,29 +341,23 @@ function updatePlayersInfo(game) {
 
 }
 
-function editTimeValue(stringToAdd, time) {
 
-    let editedTime = time.slice(0, 1) + stringToAdd + time.slice(1);
+function changeClicksLeft(player) {
 
-    return editedTime;
 
-}
-
-let intervalId;
-function changeTime(player) {
-
-    intervalId = setInterval(() => {
 
         if (player === 'creator') {
 
+            // when we emit deductClicks event the server will update the game info in the server and
+            // emit the updated game object using the event updateGameInfo
+            var creatorClicksLeft = window.game.creatorClicksLeft;
+
             if (window.player.type === 'creator') {
 
-                // when we emit deductTime event the server will update the game info in the server and
-                // emit the updated game object using the event updateGameInfo
-                var creatorTime = window.game.creatorTime;
-                creatorTime = +creatorTime - 1;
 
-                socket.emit('updateTime', {
+                creatorClicksLeft = +creatorClicksLeft - 1;
+
+                socket.emit('updateClicksLeft', {
                     gameId: window.game.id,
                     player,
                     deduct: true
@@ -365,40 +365,42 @@ function changeTime(player) {
                 });
 
 
-                if (creatorTime <= -1) {
+                if (creatorClicksLeft <= -1) {
                     return;
                 }
-                updatePlayerTime(player, creatorTime);
+                updatePlayerClicksLeft(player, creatorClicksLeft);
 
             } else if (window.player.type === 'joiner') {
 
-                var creatorTime = window.game.creatorTime;
-                creatorTime = +creatorTime - 1;
+                creatorClicksLeft = +creatorClicksLeft - 1;
 
                 //request the updated game object without any another deduction,
                 // the deduction happened when the player type is a creator
-                socket.emit('updateTime', {
+                socket.emit('updateClicksLeft', {
                     gameId: window.game.id,
                     deduct: false
                 });
 
 
-                if (creatorTime <= -1) {
+                if (creatorClicksLeft <= -1) {
                     return;
                 }
-                updatePlayerTime(player, creatorTime);
+                updatePlayerClicksLeft(player, creatorClicksLeft);
 
             }
         } else if (player === 'joiner') {
+
+            // when we emit deductClicks event the server will update the game info in the server and
+            // emit the updated game object using the event updateGameInfo
+            var joinerClicksLeft = window.game.joinerClicksLeft;
+
             if (window.player.type === 'joiner') {
 
-                // when we emit deductTime event the server will update the game info in the server and
-                // emit the updated game object using the event updateGameInfo
-                var joinerTime = window.game.joinerTime;
-                console.log({joinerTime});
-                joinerTime = +joinerTime - 1;
 
-                socket.emit('updateTime', {
+                console.log({joinerClicksLeft});
+                joinerClicksLeft = +joinerClicksLeft - 1;
+
+                socket.emit('updateClicksLeft', {
                     gameId: window.game.id,
                     player,
                     deduct: true
@@ -406,44 +408,39 @@ function changeTime(player) {
                 });
 
 
-                if (joinerTime <= -1) {
+                if (joinerClicksLeft <= -1) {
                     return;
                 }
-                updatePlayerTime(player, joinerTime);
+                updatePlayerClicksLeft(player, joinerClicksLeft);
 
             } else if (window.player.type === 'creator') {
 
-                var joinerTime = window.game.joinerTime;
-                joinerTime = +joinerTime - 1;
+                joinerClicksLeft = +joinerClicksLeft - 1;
 
                 //request the updated game object without any another deduction,
                 // the deduction happened when the player type is a creator
-                socket.emit('updateTime', {
+                socket.emit('updateClicksLeft', {
                     gameId: window.game.id,
                     deduct: false
                 });
 
 
-                if (joinerTime <= -1) {
+                if (joinerClicksLeft <= -1) {
                     return;
                 }
-                updatePlayerTime(player, joinerTime);
+                updatePlayerClicksLeft(player, joinerClicksLeft);
 
             }
         }
 
 
-    }, 1000);
-}
+    }
 
-
-function updatePlayerTime(player, time) {
+function updatePlayerClicksLeft(player, updatedClicks) {
     if (player === window.player.type) {
-        const editedTime = editTimeValue(':', time.toString().padStart(3, '0'));
-        document.querySelector('.your-time').textContent = editedTime;
+        document.querySelector('.your-clicks-left').textContent = updatedClicks;
     } else {
-        const editedTime = editTimeValue(':', time.toString().padStart(3, '0'));
-        document.querySelector('.opp-time').textContent = editedTime;
+        document.querySelector('.opp-clicks-left').textContent = updatedClicks;
     }
 
 
