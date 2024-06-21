@@ -4,13 +4,24 @@
 
 </head>
 
+
 <%- include('./partials/header.ejs') %>
 
+<div class="msg-game-not-started">
+    <h3>Waiting for someone else to join your game</h3>
+    <div class="loading-dots">
+        <span></span>
+        <span></span>
+        <span></span>
+    </div>
 
+</div>
 <section class="game-main-section">
-    <div class="players-info">
 
-        <div>
+    <h3 class="msg-creator-start-first">The game creator always starts playing first!</h3>
+    <div class="players-info opp-info">
+
+        <div class="">
             <h4 class="opp-lives">Opp lives: <span></span></h4>
             <h4 class="opp-score">Opp score: <span></span></h4>
         </div>
@@ -24,8 +35,8 @@
     </div>
 
 
-    <div class="players-info">
-        <div>
+    <div class="players-info your-info">
+        <div class="">
             <h4 class="your-lives">Your lives: <span></span></h4>
             <h4 class="your-score">Your score: <span></span></h4>
         </div>

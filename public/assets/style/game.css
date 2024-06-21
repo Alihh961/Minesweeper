@@ -1,3 +1,55 @@
+body div.msg-game-not-started{
+    display: none!important;
+}
+body.game-not-started div.msg-game-not-started {
+    position: fixed;
+    width: 300px;
+    height: 150px;
+    border-radius: 15px;
+    background-color: #fff;
+    top: 50%;
+    left: 50%;
+    z-index: 99999999999;
+    transform: translate(-50%, -50%);
+    display: flex!important;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+body.game-not-started div.msg-game-not-started h3{
+    text-align: center;
+}
+
+body.game-not-started div.msg-game-not-started .loading-dots span {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+    background-color: #333;
+    border-radius: 50%;
+    animation: loading 1.4s infinite both;
+}
+
+body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(1) {
+    animation-delay: -0.32s;
+}
+
+body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
+    animation-delay: -0.16s;
+}
+
+@keyframes loading {
+    0%, 80%, 100% {
+        transform: scale(0);
+    }
+    40% {
+        transform: scale(1);
+    }
+}
+
 .game-main-section {
     margin: 50px 0 0 0;
     width: 100%;
@@ -6,9 +58,11 @@
     justify-content: center;
     align-items: center;
     gap: 15px;
+    overflow: hidden;
+
 }
 
-.game-main-section .players-info{
+.game-main-section .players-info {
     width: 253px;
     background: white;
     padding: 10px;
@@ -18,11 +72,18 @@
     justify-content: space-around;
 }
 
-.game-main-section .players-info h4.clicks-left{
+.game-main-section .players-info.your-info{
+    background: linear-gradient(5deg, #0c7e0c, #5bda66);
+}
+
+.game-main-section .players-info.opp-info{
+    background: linear-gradient(5deg, #e31818, #da5b5b);
+}
+.game-main-section .players-info h4.clicks-left {
 
 }
 
-.game-main-section .players-info h4.clicks-left.alert{
+.game-main-section .players-info h4.clicks-left.alert {
 
     color: red;
 }
@@ -59,6 +120,7 @@
 .game-main-section .mines-container span.square.mine {
     color: red;
 }
+
 .game-main-section .mines-container span.square:active {
     background: #bdbdbd;
     border: solid #999;
@@ -73,5 +135,40 @@
 }
 
 .game-main-section .mines-container span.square.opened.joiner {
-    background-color: #d88484!important;
+    background-color: #d88484 !important;
+}
+
+.game-main-section .msg-creator-start-first{
+    color: white;
+    background: #0c7e0c;
+    letter-spacing: 2px;
+    position: absolute;
+    z-index: 9;
+    padding: 50px;
+    border-radius: 15px;
+    background: linear-gradient(45deg, #6f8a83, #4a4a35);
+    display: none;
+}
+
+.game-main-section .msg-creator-start-first.fadeOut{
+    display: block;
+    animation: fadeOutMsg 3s 2s forwards ;
+
+}
+
+
+@keyframes fadeOutMsg {
+
+    from{
+        transform: scale(1);
+        opacity: 1;
+        display: block;
+    }
+
+    to{
+        transform: scale(15);
+        opacity: 0;
+        display: none;
+    }
+
 }

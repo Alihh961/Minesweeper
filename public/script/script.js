@@ -10,16 +10,7 @@ if (pageTitle === 'Minesweeper-Game') {
 
 
 
-    const squaresContainer = document.querySelector('.mines-container');
 
-    for (let i = 0; i < 100; i++) {
-        var span = document.createElement('span');
-
-        span.classList.add('square');
-        span.setAttribute('data-square', `${i}`);
-
-        squaresContainer.appendChild(span);
-    }
 
 
 

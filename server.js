@@ -65,7 +65,7 @@ io.on('connection', (socket) => {
             game.creator = creatorObject.creator;
             games.push(game);
             socket.join(game.id);
-            socket.emit('gameCreatedSuccessfully', {
+            io.to(game.id).emit('gameCreatedSuccessfully', {
                 message: 'Game created successfully',
                 game
             });
@@ -87,23 +87,24 @@ io.on('connection', (socket) => {
 
             if(player === 'creator'){
                 game.creatorClicksLeft -= 1;
-                console.log('here' , game.creatorClicksLeft);
                 if(game.creatorClicksLeft <= 0){
-                    socket.emit('ranOfClicks' , {
+                    io.to(data.gameId).emit('ranOfClicks' , {
                         message : 'No more clicks',
                         player : 'creator'
                     })
+                    closeAGame(game.id);
                 }
             }else if(player === 'joiner'){
                 game.joinerClicksLeft -= 1;
                 if(game.joinerClicksLeft <= 0){
-                    socket.emit('ranOfClicks' , {
+
+                    io.to(data.gameId).emit('ranOfClicks' , {
                         message : 'No more clicks',
                         player : 'creator'
                     })
+                    closeAGame(game.id);
                 }
             }
-
         }
 
 
@@ -134,7 +135,7 @@ io.on('connection', (socket) => {
                     socket.join(data.gameId);
                     currentGame.closed = true;
                     currentGame.joiner = (data.joiner);
-                    socket.emit('gameJoinedSuccessfully', {
+                    io.to(currentGame.id).emit('gameJoinedSuccessfully', {
                         game: currentGame
                     });
 
@@ -182,22 +183,29 @@ io.on('connection', (socket) => {
             clicker = 'joiner';
         }else{
             clicker = 'creator';
-
         }
+
         games.forEach(game => {
-            if (game.id == gameId) {
-                value = game.returnThenRemoveAnObject(squareId ,clicker);
-                currentGame = game;
+            if (game.id === gameId) {
+
+                if(game.nextClicker === clicker){
+                    value = game.returnThenRemoveAnObject(squareId ,clicker);
+                    currentGame = game;
+                    io.to(data.gameId).emit('receiveSquareContent', {
+                        value,
+                        squareId,
+                        currentGame
+                    });
+                }else{
+                    socket.emit('notYourClick');
+                }
+
             }
 
 
         });
 
-        io.to(data.gameId).emit('receiveSquareContent', {
-            value,
-            squareId,
-            currentGame
-        });
+
 
 
     });
@@ -212,7 +220,7 @@ io.on('connection', (socket) => {
 
         const currentGame = getGameById(data.id);
 
-        socket.emit('setGameById', {
+        io.to(currentGame.id).emit('setGameById', {
             game: currentGame
         })
     })
@@ -221,7 +229,6 @@ io.on('connection', (socket) => {
 
         closeAGame(data.gameId);
 
-        io.leave(data.gameId);
         io.emit('receivingAllGames', {
             games
         });

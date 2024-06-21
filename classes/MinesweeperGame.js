@@ -11,6 +11,7 @@ class MinesweeperGame {
         this.joinerScore = 0;
         this.joinerLives = 3;
         this.joinerClicksLeft = 15;
+        this.nextClicker= 'creator';
         this.id = this.generateUUIDv4();
         this.removedValues = [];
         this.closed = false;

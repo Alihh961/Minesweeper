@@ -1,6 +1,8 @@
 // i must solve the problem on refresh it shows that i won while it must check who refreshed the page and show dif msgs
 let socket = io();
 
+document.body.style.overflow = 'hidden';
+
 window.player = {};
 const creator = document.querySelector("input[name='creator']").value;
 const joiner = document.querySelector("input[name='joiner']").value;
@@ -8,11 +10,16 @@ const gameId = document.querySelector("input[name='gameId']").value;
 const loggedUser = document.querySelector("input[name='loggedUser']").value;
 const hashedPlayerType = document.querySelector("input[name='hashedPlayerType']").value;
 
+
 window.hashedPlayerType = hashedPlayerType;
 
 if (creator) {
+
     socket.emit('createAGame', {creator: creator});
     window.player.type = 'creator';
+
+    document.body.style.pointerEvents = 'none';
+    document.body.classList.add('game-not-started');
 
 
 } else if (joiner) {
@@ -36,9 +43,72 @@ socket.on('gameCreatedSuccessfully', function (data) {
     window.game = data.game;
     updatePlayersInfo(data.game);
 });
+
+// starting the game
 socket.on('gameJoinedSuccessfully', function (data) {
+    document.body.style.pointerEvents = 'auto';
+    document.body.classList.remove('game-not-started');
+
+    const msgCreatorClickFirst = document.querySelector('.game-main-section .msg-creator-start-first');
+
+    msgCreatorClickFirst.classList.add('fadeOut');
+
+    const squaresContainer = document.querySelector('.mines-container');
+
+    for (let i = 0; i < 100; i++) {
+        var span = document.createElement('span');
+
+        span.classList.add('square');
+        span.setAttribute('data-square', `${i}`);
+
+        squaresContainer.appendChild(span);
+    }
     window.gameId = data.game.id;
     updatePlayersInfo(data.game);
+
+
+    var squares = document.querySelectorAll('.square');
+    if (squares) {
+        squares.forEach((square) => {
+            square.addEventListener('click', (event) => {
+                let clickedSquare = event.target;
+                let squareId = clickedSquare.getAttribute('data-square');
+
+
+                document.querySelector('.msg-creator-start-first').style.display = 'none';
+
+                if(window.player.type === 'joiner' || window.player.type === 'creator'){
+                    // Emit the squareClicked event to the server
+                    socket.emit('squareClicked', {
+                        message: 'A square was clicked!',
+                        squareId,
+                        gameId: window.gameId,
+                        hashedPlayerType
+
+                    });
+                    changeClicksLeft(window.player.type);
+
+                }else{
+                    socket.emit('closeGame' , {
+                        gameId
+                    })
+                    Swal.fire({
+                        icon : 'error',
+                        title : 'Error' ,
+
+                    }).then(function(){
+                        window.location.href ='lobby';
+                    })
+                }
+
+
+
+            });
+        });
+    }
+
+
+
 });
 
 socket.on('errorCreatingGame', (error) => {
@@ -50,30 +120,14 @@ socket.on('errorCreatingGame', (error) => {
     });
 })
 
+socket.on('notYourClick' , function(data){
+    Swal.fire({
+        icon : "error" ,
+        title : "Wait" ,
+        text : "It is not your turn yet!"
+    })
+})
 
-var squares = document.querySelectorAll('.square');
-if (squares) {
-    squares.forEach((square) => {
-        square.addEventListener('click', (event) => {
-            let clickedSquare = event.target;
-            let squareId = clickedSquare.getAttribute('data-square');
-
-            clickedSquare.classList.add('opened');
-            // Emit the squareClicked event to the server
-            socket.emit('squareClicked', {
-                message: 'A square was clicked!',
-                squareId,
-                gameId: window.gameId,
-                hashedPlayerType
-
-            });
-
-            changeClicksLeft(window.player.type);
-
-
-        });
-    });
-}
 
 socket.on('receiveSquareContent', function (data) {
 
@@ -304,7 +358,13 @@ socket.on('updateGameInfo', (data) => {
 
 })
 
-socket.on('ranOfClicks')
+socket.on('ranOfClicks' , function(data){
+    Swal.fire({
+        icon : 'info' ,
+        title : 'Game Ended',
+        text : 'Game ended for running out of clicks'
+    })
+})
 
 
 function updatePlayersInfo(game) {
@@ -317,6 +377,7 @@ function updatePlayersInfo(game) {
 
 
     if (window.player.type === 'joiner') {
+
         document.querySelector('.your-lives span').textContent = joinerLives;
         document.querySelector('.your-score span').textContent = joinerScore;
         document.querySelector('.opp-lives span').textContent = creatorLives;
