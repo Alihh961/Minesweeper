@@ -16,18 +16,27 @@
     </div>
 
 </div>
+
+
 <section class="game-main-section">
 
     <h3 class="msg-creator-start-first">The game creator always starts playing first!</h3>
-    <div class="players-info opp-info">
 
-        <div class="">
-            <h4 class="opp-lives">Opp lives: <span></span></h4>
-            <h4 class="opp-score">Opp score: <span></span></h4>
+    <div class="players-info-container">
+
+        <div id="timer"></div>
+
+        <div class="players-info opp-info">
+
+            <div class="">
+                <h4 class="opp-lives">Opp lives: <span></span></h4>
+                <h4 class="opp-score">Opp score: <span></span></h4>
+            </div>
+
+            <h4 class="opp-clicks-left clicks-left"></h4>
+
+
         </div>
-
-        <h4 class="opp-clicks-left clicks-left"></h4>
-
 
     </div>
     <div class="mines-container">
@@ -35,13 +44,17 @@
     </div>
 
 
-    <div class="players-info your-info">
-        <div class="">
-            <h4 class="your-lives">Your lives: <span></span></h4>
-            <h4 class="your-score">Your score: <span></span></h4>
-        </div>
+    <div class="players-info-container">
+        <div class="players-info your-info">
+            <div class="">
+                <h4 class="your-lives">Your lives: <span></span></h4>
+                <h4 class="your-score">Your score: <span></span></h4>
+            </div>
 
-        <h4 class="your-clicks-left clicks-left"></h4>
+            <h4 class="your-clicks-left clicks-left"></h4>
+
+
+        </div>
 
 
     </div>
@@ -51,7 +64,7 @@
 <input type="hidden" value="<%= gameId %>" name="gameId"/>
 <input type="hidden" value="<%= hashedPlayerType %>" name="hashedPlayerType"/>
 
-<button class="start">start</button>
+<button class="coucou">start</button>
 <button class="stop">stop</button>
 
 <script src="script/game.js" defer></script>

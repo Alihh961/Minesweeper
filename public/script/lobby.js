@@ -32,6 +32,7 @@ socket.emit('getAllGames', {
 
 socket.on('receivingAllGames', (data) => {
     allGames = data.games;
+    console.log({gamesData : data});
     if (gamesListContainer) {
 
         if (allGames && allGames.length > 0) {
@@ -69,9 +70,8 @@ function updateGamesList(games, gamesListContainer) {
 
             const button = document.createElement('button');
             button.setAttribute('type', 'submit');
-            button.innerText = `${game.creator}'s game`;
+            button.innerText = `${game.creator.name}'s game`;
             button.classList.add('game-join-button');
-            console.log(game);
 
             if(game.closed){
                 button.classList.add('closed');

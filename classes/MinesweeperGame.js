@@ -3,35 +3,25 @@ class MinesweeperGame {
 
     constructor() {
         this.objects = this._generateObjects();
-        this.creator ;
-        this.creatorScore = 0;
-        this.creatorLives = 3;
-        this.creatorClicksLeft = 2 ;
-        this.joiner ;
-        this.joinerScore = 0;
-        this.joinerLives = 3;
-        this.joinerClicksLeft = 15;
-        this.nextClicker= 'creator';
-        this.id = this.generateUUIDv4();
         this.removedValues = [];
+
+        this.creator = null;
+        this.joiner = null;
+
+        this.nextClicker = 'creator';
+        this.id = this._generateUUIDv4();
         this.closed = false;
     }
 
-    setCreator(name){
-        this.creator = name;
+    addCreator(id) {
+        this.creator = new Player(id, 'creator');
     }
 
-    getCreator(){
-        return this.creator;
+    addJoiner(id) {
+        this.joiner = new Player(id, 'joiner');
     }
 
-    setJoiner(name){
-        this.joiner = name;
-    }
 
-    getJoiner(){
-        return this.joiner;
-    }
 
     _generateObjects() {
 
@@ -67,57 +57,63 @@ class MinesweeperGame {
         return array;
     }
 
-    getObjects(){
+    _getObjects(){
         return this.objects;
     }
 
-    returnThenRemoveAnObject(index , player){
+    returnThenRemoveAnObject(index, player) {
+        const randomValue = this._getObjects()[index];
 
+        this._getObjects()[index] = null;
+        this.removedValues.push({ value: randomValue, squareId: index });
 
-        const randomValue = this.getObjects()[index];
-
-        this.getObjects()[index] = null;
-        this.removedValues.push({value : randomValue , squareId : index});
-
-        if(randomValue == '-'){
-
-            if(player === 'creator'){
-                this.creatorLives -= 1;
-
-            }else{
-                this.joinerLives -= 1;
-
-            }
-        }else if(randomValue == '+'){
-
-            if(player === 'creator'){
-                this.creatorLives += 1;
-
-            }else{
-                this.joinerLives += 1;
-
-            }
-        }else{
-            if(player === 'creator'){
-                this.creatorScore += randomValue;
-
-            }else{
-                this.joinerScore += randomValue;
-
-            }
-        }
-
+        this._updatePlayerStats(randomValue, player);
+        this._updateClicksLeft(player);
+        this._toggleNextClicker();
 
         return randomValue;
     }
 
-    generateUUIDv4() {
+    checkPlayerClicks(player){
+
+        if(player === 'creator'){
+            console.log(this.creator.clicksLeft);
+
+            return this.creator.clicksLeft;
+
+        }else if(player === 'joiner'){
+            return this.joiner.clicksLeft;
+
+        }
+        return false;
+    }
+
+    _updatePlayerStats(value, player) {
+        if (value === '-') {
+            player === 'creator' ? this.creator.deductLife() : this.joiner.deductLife();
+        } else if (value === '+') {
+            player === 'creator' ? this.creator.addLife() : this.joiner.addLife();
+        } else {
+            player === 'creator' ? this.creator.adjustScore(+value) : this.joiner.adjustScore(+value);
+        }
+    }
+
+    _updateClicksLeft(player) {
+        player === 'creator' ? this.creator.adjustClicksLeft() : this.joiner.adjustClicksLeft();
+    }
+
+    _toggleNextClicker() {
+        this.nextClicker = this.nextClicker === 'joiner' ? 'creator' : 'joiner';
+    }
+
+    _generateUUIDv4() {
         return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
             const r = Math.random() * 16 | 0,
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
-    }
+    };
+
 
 
 }

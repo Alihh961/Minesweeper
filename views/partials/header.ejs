@@ -1,10 +1,13 @@
 <%- include('../index.ejs')%>
 
+<header>
+    <% if(user) { %>
+        <h3>You are logged in as <%= user.userName %></h3>
 
-<% if(user) { %>
-<h3>You are logged in as <%= user.userName %></h3>
+        <a href="user/logout"> logout</a>
+        <input type="hidden" value="<%= user.userName %>" name="loggedUser"/>
+</header>
 
-<a href="user/logout"> logout</a>
-<input type="hidden" value="<%= user.userName %>" name="loggedUser"/>
+
 
 <% } %>

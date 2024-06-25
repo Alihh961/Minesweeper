@@ -6,7 +6,7 @@ body.game-not-started div.msg-game-not-started {
     width: 300px;
     height: 150px;
     border-radius: 15px;
-    background-color: #fff;
+    background: linear-gradient(267deg, #29ce29, #c4c41a);
     top: 50%;
     left: 50%;
     z-index: 99999999999;
@@ -57,19 +57,44 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 15px;
     overflow: hidden;
 
 }
 
+.players-info-container{
+    width: 254px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
 .game-main-section .players-info {
-    width: 253px;
+    width: 254px;
     background: white;
     padding: 10px;
-    border-radius: 5px;
     display: flex;
     align-items: center;
     justify-content: space-around;
+    border-left: 2px solid black;
+    border-right: 2px solid black;
+
+}
+
+.game-main-section .players-info:nth-of-type(2){
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top: 2px solid black;
+
+}
+
+.game-main-section .players-info:nth-of-type(1){
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom: 2px solid black;
+
 }
 
 .game-main-section .players-info.your-info{
@@ -89,10 +114,11 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
 }
 
 .game-main-section .mines-container {
-    width: 253px;
-    height: 253px;
+    width: 254px;
+    height: 249px;
     margin: auto;
-    border: solid #222222 2px;
+    border-right: solid #222222 2px;
+    border-left: solid #222222 2px;
     display: grid;
     grid-template-columns: repeat(10, auto);
     grid-auto-rows: max-content;
@@ -171,4 +197,68 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
         display: none;
     }
 
+}
+
+
+
+<!-- time counter -->
+
+.time{
+    width: 50px;
+    height: 50px;
+}
+
+   .base-timer {
+       position: relative;
+       width: 50px;
+       height: 50px;
+   }
+
+.base-timer__svg {
+    transform: scaleX(-1);
+}
+
+.base-timer__circle {
+    fill: none;
+    stroke: none;
+}
+
+.base-timer__path-elapsed {
+    stroke-width: 7px;
+    stroke: grey;
+}
+
+.base-timer__path-remaining {
+    stroke-width: 7px;
+    stroke-linecap: round;
+    transform: rotate(90deg);
+    transform-origin: center;
+    transition: 1s linear all;
+    fill-rule: nonzero;
+    stroke: currentColor;
+}
+
+.base-timer__path-remaining.green {
+    color: rgb(65, 184, 131);
+}
+
+.base-timer__path-remaining.orange {
+    color: orange;
+}
+
+.base-timer__path-remaining.red {
+    color: red;
+}
+
+.base-timer__label {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    top: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    color: white;
+    font-family: sans-serif;
 }

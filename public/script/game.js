@@ -1,9 +1,12 @@
 // i must solve the problem on refresh it shows that i won while it must check who refreshed the page and show dif msgs
+
+// check the game name in lobby page
 let socket = io();
 
 document.body.style.overflow = 'hidden';
 
 window.player = {};
+
 const creator = document.querySelector("input[name='creator']").value;
 const joiner = document.querySelector("input[name='joiner']").value;
 const gameId = document.querySelector("input[name='gameId']").value;
@@ -39,9 +42,10 @@ socket.on('errorJoiningAGame', function (error) {
 })
 socket.on('gameCreatedSuccessfully', function (data) {
 
-    window.gameId = data.game.id;
+    console.log({game : data});
     window.game = data.game;
-    updatePlayersInfo(data.game);
+
+
 });
 
 // starting the game
@@ -63,7 +67,6 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
         squaresContainer.appendChild(span);
     }
-    window.gameId = data.game.id;
     updatePlayersInfo(data.game);
 
 
@@ -82,11 +85,11 @@ socket.on('gameJoinedSuccessfully', function (data) {
                     socket.emit('squareClicked', {
                         message: 'A square was clicked!',
                         squareId,
-                        gameId: window.gameId,
+                        gameId: window.game.id,
                         hashedPlayerType
 
                     });
-                    changeClicksLeft(window.player.type);
+                    // changeClicksLeft(window.player.type);
 
                 }else{
                     socket.emit('closeGame' , {
@@ -129,6 +132,16 @@ socket.on('notYourClick' , function(data){
 })
 
 
+document.querySelector('.coucou').addEventListener('click' , ()=>{
+    socket.emit('toto' , {
+        playerId : window.game.creatorId
+    });
+});
+
+socket.on('totoz' , (data)=>{
+    console.log(data.message)
+})
+
 socket.on('receiveSquareContent', function (data) {
 
 
@@ -138,10 +151,12 @@ socket.on('receiveSquareContent', function (data) {
     const joinerLives = data.currentGame.joinerLives;
 
 
+    //change the logic when lives equal to zero
     if (creatorLives === 0 || joinerLives === 0) {
 
+
         socket.emit('closeGame', {
-            gameId: window.gameId,
+            gameId: window.game.id,
             noMoreLives: 1
         });
 
@@ -256,6 +271,9 @@ socket.on('receiveSquareContent', function (data) {
 
     if (clickedSquare) {
 
+window.game = data.currentGame;
+console.log(data.currentGame);
+
         if (typeof (value) === "number") {
             clickedSquare.innerHTML = data.value;
 
@@ -292,18 +310,31 @@ socket.on('receiveSquareContent', function (data) {
             console.error("Error while adding content to a square")
         }
 
+        updatePlayersInfo(data.currentGame);
+
+    }else{
+        socket.emit('closeGame' , {
+            gameId : window.game.id
+        });
+
+        Swal.fire({
+            icon :"error" ,
+            title : 'Error',
+            text : 'Something went wrong!'
+        }).then(function (){
+            window.location.href = '/lobby';
+        })
 
     }
-    updatePlayersInfo(data.currentGame);
 });
 
 
 window.addEventListener('beforeunload', () => {
-    if (window.gameId) {
+    if (window.game.id) {
         let player = window.player.type;
         socket.emit('closeGame', {
-            gameId: window.gameId,
-            message: 'close the game of id ' + window.gameId,
+            gameId: window.game.id,
+            message: 'close the game of id ' + window.game.id,
             player,
             refreshed: true
         });
@@ -368,32 +399,29 @@ socket.on('ranOfClicks' , function(data){
 
 
 function updatePlayersInfo(game) {
-    const creatorLives = game.creatorLives;
-    const joinerLives = game.joinerLives;
-    const creatorScore = game.creatorScore;
-    const joinerScore = game.joinerScore;
-    const creatorClicksLeft = game.creatorClicksLeft;
-    const joinerClicksLeft = game.joinerClicksLeft;
+    const creator = game.creator;
+    const joiner = game.joiner;
 
+    console.log(game);
 
     if (window.player.type === 'joiner') {
 
-        document.querySelector('.your-lives span').textContent = joinerLives;
-        document.querySelector('.your-score span').textContent = joinerScore;
-        document.querySelector('.opp-lives span').textContent = creatorLives;
-        document.querySelector('.opp-score span').textContent = creatorScore;
-        document.querySelector('.opp-clicks-left').textContent = creatorClicksLeft;
-        document.querySelector('.your-clicks-left').textContent = joinerClicksLeft;
+        document.querySelector('.your-lives span').textContent = joiner.lives;
+        document.querySelector('.your-score span').textContent = joiner.score;
+        document.querySelector('.opp-lives span').textContent = creator.lives;
+        document.querySelector('.opp-score span').textContent = creator.score;
+        document.querySelector('.opp-clicks-left').textContent = creator.clicksLeft;
+        document.querySelector('.your-clicks-left').textContent = joiner.clicksLeft;
 
 
     } else if (window.player.type === 'creator') {
 
-        document.querySelector('.your-lives span').textContent = creatorLives;
-        document.querySelector('.your-score span').textContent = creatorScore;
-        document.querySelector('.opp-lives span').textContent = joinerLives;
-        document.querySelector('.opp-score span').textContent = joinerScore;
-        document.querySelector('.opp-clicks-left').textContent = joinerClicksLeft;
-        document.querySelector('.your-clicks-left').textContent = creatorClicksLeft;
+        document.querySelector('.your-lives span').textContent = creator.lives;
+        document.querySelector('.your-score span').textContent = creator.score;
+        document.querySelector('.opp-lives span').textContent = joiner.lives;
+        document.querySelector('.opp-score span').textContent = joiner.score;
+        document.querySelector('.opp-clicks-left').textContent = joiner.clicksLeft;
+        document.querySelector('.your-clicks-left').textContent = creator.clicksLeft;
 
     } else {
         console.log('Error updating lives and scores');
@@ -411,7 +439,7 @@ function changeClicksLeft(player) {
 
             // when we emit deductClicks event the server will update the game info in the server and
             // emit the updated game object using the event updateGameInfo
-            var creatorClicksLeft = window.game.creatorClicksLeft;
+            var creatorClicksLeft = window.game.creator.clicksLeft;
 
             if (window.player.type === 'creator') {
 
@@ -509,3 +537,121 @@ function updatePlayerClicksLeft(player, updatedClicks) {
 
 
 // redirecting to lobby and delete the game if the user reload the page
+
+
+
+// timer
+
+const FULL_DASH_ARRAY = 283;
+const WARNING_THRESHOLD = 10;
+const ALERT_THRESHOLD = 5;
+
+const COLOR_CODES = {
+    info: {
+        color: "green"
+    },
+    warning: {
+        color: "orange",
+        threshold: WARNING_THRESHOLD
+    },
+    alert: {
+        color: "red",
+        threshold: ALERT_THRESHOLD
+    }
+};
+
+const TIME_LIMIT = 500;
+let timePassed = 0;
+let timeLeft = TIME_LIMIT;
+let timerInterval = null;
+let remainingPathColor = COLOR_CODES.info.color;
+
+document.getElementById("timer").innerHTML = `
+<div class="base-timer">
+  <svg class="base-timer__svg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <g class="base-timer__circle">
+      <circle class="base-timer__path-elapsed" cx="50" cy="50" r="45"></circle>
+      <path
+        id="base-timer-path-remaining"
+        stroke-dasharray="283"
+        class="base-timer__path-remaining ${remainingPathColor}"
+        d="
+          M 50, 50
+          m -45, 0
+          a 45,45 0 1,0 90,0
+          a 45,45 0 1,0 -90,0
+        "
+      ></path>
+    </g>
+  </svg>
+  <span id="base-timer-label" class="base-timer__label">${formatTime(
+    timeLeft
+)}</span>
+</div>
+`;
+
+startTimer();
+
+function onTimesUp() {
+    clearInterval(timerInterval);
+}
+
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timePassed = timePassed += 1;
+        timeLeft = TIME_LIMIT - timePassed;
+        document.getElementById("base-timer-label").innerHTML = formatTime(
+            timeLeft
+        );
+        setCircleDasharray();
+        setRemainingPathColor(timeLeft);
+
+        if (timeLeft === 0) {
+            onTimesUp();
+        }
+    }, 1000);
+}
+
+function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    let seconds = time % 60;
+
+    if (seconds < 10) {
+        seconds = `0${seconds}`;
+    }
+
+    return `${minutes}:${seconds}`;
+}
+
+function setRemainingPathColor(timeLeft) {
+    const { alert, warning, info } = COLOR_CODES;
+    if (timeLeft <= alert.threshold) {
+        document
+            .getElementById("base-timer-path-remaining")
+            .classList.remove(warning.color);
+        document
+            .getElementById("base-timer-path-remaining")
+            .classList.add(alert.color);
+    } else if (timeLeft <= warning.threshold) {
+        document
+            .getElementById("base-timer-path-remaining")
+            .classList.remove(info.color);
+        document
+            .getElementById("base-timer-path-remaining")
+            .classList.add(warning.color);
+    }
+}
+
+function calculateTimeFraction() {
+    const rawTimeFraction = timeLeft / TIME_LIMIT;
+    return rawTimeFraction - (1 / TIME_LIMIT) * (1 - rawTimeFraction);
+}
+
+function setCircleDasharray() {
+    const circleDasharray = `${(
+        calculateTimeFraction() * FULL_DASH_ARRAY
+    ).toFixed(0)} 283`;
+    document
+        .getElementById("base-timer-path-remaining")
+        .setAttribute("stroke-dasharray", circleDasharray);
+}

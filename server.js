@@ -3,6 +3,8 @@ const path = require('path');
 const userRouter = require('./routes/UserRouter');
 const cookieParser = require('cookie-parser');
 let MinesweeperGame = require('./classes/MinesweeperGame');
+
+let Player = require('./classes/Player');
 const functions = require('./public/utils/functions');
 const bcrypt = require('bcryptjs');
 
@@ -49,10 +51,12 @@ let games = [];
 
 io.on('connection', (socket) => {
 
+    const playerId = socket.id;
+
     socket.on('createAGame', (creatorObject) => {
         let gameExists = false;
         games.forEach(game => {
-            if (game.creator === creatorObject.creator) {
+            if (game.creator.name === creatorObject.creator) {
                 gameExists = true;
                 socket.emit('errorCreatingGame', {
                     message: 'A game exists already for ' + creatorObject.creator
@@ -62,7 +66,8 @@ io.on('connection', (socket) => {
 
         if (!gameExists) {
             var game = new MinesweeperGame();
-            game.creator = creatorObject.creator;
+            game.creator = new Player(playerId , 'creator' , creatorObject.creator);
+
             games.push(game);
             socket.join(game.id);
             io.to(game.id).emit('gameCreatedSuccessfully', {
@@ -78,43 +83,42 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('updateClicksLeft' , (data)=>{
-
-        let game = getGameById(data.gameId);
-        let player = data.player;
-
-        if(data.deduct){
-
-            if(player === 'creator'){
-                game.creatorClicksLeft -= 1;
-                if(game.creatorClicksLeft <= 0){
-                    io.to(data.gameId).emit('ranOfClicks' , {
-                        message : 'No more clicks',
-                        player : 'creator'
-                    })
-                    closeAGame(game.id);
-                }
-            }else if(player === 'joiner'){
-                game.joinerClicksLeft -= 1;
-                if(game.joinerClicksLeft <= 0){
-
-                    io.to(data.gameId).emit('ranOfClicks' , {
-                        message : 'No more clicks',
-                        player : 'creator'
-                    })
-                    closeAGame(game.id);
-                }
-            }
-        }
-
-
-
-    io.to(data.gameId).emit('updateGameInfo' , {
-        game
-    })
-
-    });
-
+    // socket.on('updateClicksLeft' , (data)=>{
+    //
+    //     let game = getGameById(data.gameId);
+    //     let player = data.player;
+    //
+    //     if(data.deduct){
+    //
+    //         if(player === 'creator'){
+    //             game.creatorClicksLeft -= 1;
+    //             // if(game.creatorClicksLeft <= 0){
+    //             //     io.to(data.gameId).emit('ranOfClicks' , {
+    //             //         message : 'No more clicks',
+    //             //         player : 'creator'
+    //             //     })
+    //             //     closeAGame(game.id);
+    //             // }
+    //         }else if(player === 'joiner'){
+    //             game.joinerClicksLeft -= 1;
+    //             // if(game.joinerClicksLeft <= 0){
+    //             //
+    //             //     io.to(data.gameId).emit('ranOfClicks' , {
+    //             //         message : 'No more clicks',
+    //             //         player : 'creator'
+    //             //     })
+    //             //     closeAGame(game.id);
+    //             // }
+    //         }
+    //     }
+    //
+    //
+    //
+    // io.to(data.gameId).emit('updateGameInfo' , {
+    //     game
+    // })
+    //
+    // });
 
 
     socket.on('join', (data) => {
@@ -127,14 +131,14 @@ io.on('connection', (socket) => {
         if (game) {
             // object Minesweeper game
             let currentGame = getGameById(data.gameId);
-            if (currentGame.creator === data.joiner) {
+            if (currentGame.creator.name === data.joiner) {
                 errorMessage = `You can't join your game!`;
 
             } else {
                 if (game.size === 1 && !game.closed) {
                     socket.join(data.gameId);
                     currentGame.closed = true;
-                    currentGame.joiner = (data.joiner);
+                    currentGame.joiner = new Player(socket.id , 'joiner' , data.joiner);
                     io.to(currentGame.id).emit('gameJoinedSuccessfully', {
                         game: currentGame
                     });
@@ -160,17 +164,14 @@ io.on('connection', (socket) => {
 
     });
 
-    function getGameById(gameId) {
-        for (let game of games) { // using return with forEach will exit the forEach and not the whole function
-            if (game.id === gameId) {
-                return game;
-            }
-        }
-        return 0;
-    }
-
+    socket.on('toto' , (data)=>{
+        io.to(data.playerId).emit('totoz' , {
+            message : 'hello there'
+        });
+    })
 
     socket.on('squareClicked', async (data) => {
+
         let squareId = data.squareId;
         let gameId = data.gameId;
         let value;
@@ -188,18 +189,32 @@ io.on('connection', (socket) => {
         games.forEach(game => {
             if (game.id === gameId) {
 
+                if(game.checkPlayerClicks(clicker)){
+
+
+
                 if(game.nextClicker === clicker){
+
+
+
                     value = game.returnThenRemoveAnObject(squareId ,clicker);
+
                     currentGame = game;
                     io.to(data.gameId).emit('receiveSquareContent', {
                         value,
                         squareId,
                         currentGame
                     });
+
                 }else{
+
+
                     socket.emit('notYourClick');
                 }
-
+            }else{
+                    // io.to().emit('noMoreClicks');
+                    console.log(`The ${clicker} ran out of clicks`);
+                }
             }
 
 
@@ -254,6 +269,15 @@ io.on('connection', (socket) => {
         if (index !== -1) {
             games.splice(index, 1);
         }
+    }
+
+    function getGameById(gameId) {
+        for (let game of games) { // using return with forEach will exit the forEach and not the whole function
+            if (game.id === gameId) {
+                return game;
+            }
+        }
+        return 0;
     }
 
 
