@@ -88,6 +88,14 @@ class MinesweeperGame {
         return false;
     }
 
+    checkPlayerLives(player){
+        if(player === 'creator'){
+            return this.creator.lives;
+        }else if(player === 'joiner'){
+            return this.joiner.lives;
+        }
+    }
+
     _updatePlayerStats(value, player) {
         if (value === '-') {
             player === 'creator' ? this.creator.deductLife() : this.joiner.deductLife();

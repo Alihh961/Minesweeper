@@ -147,123 +147,10 @@ socket.on('receiveSquareContent', function (data) {
 
 
 
-    const creatorLives = data.currentGame.creatorLives;
-    const joinerLives = data.currentGame.joinerLives;
+    const creatorLives = data.currentGame.creator.lives;
+    const joinerLives = data.currentGame.joiner.lives;
 
-
-    //change the logic when lives equal to zero
-    if (creatorLives === 0 || joinerLives === 0) {
-
-
-        socket.emit('closeGame', {
-            gameId: window.game.id,
-            noMoreLives: 1
-        });
-
-        if (creatorLives === 0) {
-            if (window.player.type === 'joiner') {
-                Swal.fire({
-                    title: 'Congratulation ,You have won',
-                    confirmButtonText: "Back to lobby",
-                    showClass: {
-                        popup: `
-      animate__animated
-      animate__fadeInUp
-      animate__faster
-    `
-                    },
-                    hideClass: {
-                        popup: `
-      animate__animated
-      animate__fadeOutDown
-      animate__faster
-    `
-                    }
-                }).then(function () {
-                    window.location.href = '/lobby';
-                });
-
-
-            } else if (window.player.type === 'creator') {
-                Swal.fire({
-                    title: 'Ops, You have lost',
-                    confirmButtonText: "Back to lobby",
-                    showClass: {
-                        popup: `
-      animate__animated
-      animate__fadeInUp
-      animate__faster
-    `
-                    },
-                    hideClass: {
-                        popup: `
-      animate__animated
-      animate__fadeOutDown
-      animate__faster
-    `
-                    }
-                }).then(function () {
-                    window.location.href = '/lobby';
-                });
-            }
-
-        } else if (joinerLives === 0) {
-            if (window.player.type === 'creator') {
-                Swal.fire({
-                    title: 'Congratulation ,You have won',
-                    confirmButtonText: "Back to lobby",
-                    showClass: {
-                        popup: `
-      animate__animated
-      animate__fadeInUp
-      animate__faster
-    `
-                    },
-                    hideClass: {
-                        popup: `
-      animate__animated
-      animate__fadeOutDown
-      animate__faster
-    `
-                    }
-                }).then(function () {
-                    window.location.href = '/lobby';
-                });
-
-
-            } else if (window.player.type === 'joiner') {
-                Swal.fire({
-                    title: 'Ops, You have lost',
-                    confirmButtonText: "Back to lobby",
-                    showClass: {
-                        popup: `
-      animate__animated
-      animate__fadeInUp
-      animate__faster
-    `
-                    },
-                    hideClass: {
-                        popup: `
-      animate__animated
-      animate__fadeOutDown
-      animate__faster
-    `
-                    }
-                }).then(function () {
-                    window.location.href = '/lobby';
-                });
-            }
-
-        } else {
-            Swal.fire({
-                icon: "error",
-                title: "Error",
-                text: "An error occurred"
-            }).then(function () {
-                window.location.href = '/lobby';
-            })
-        }
-    }
+    console.log('received')
 
 
     let clickedSquare = document.querySelector(`[data-square="${data.squareId}"]`);
@@ -327,6 +214,55 @@ console.log(data.currentGame);
 
     }
 });
+
+
+// when there is no clicks this event will be executed 2 seconds after the last click
+socket.on('noClicksLeft' , function (data){
+
+    onNoMoreClickLeft(data.game);
+});
+
+socket.on('noMoreLivesForOpp' , function(data){
+
+    Swal.fire({
+        title: 'Congratulations!',
+        text: 'You have won, Your opponent has no more lives',
+        icon: 'success',
+        showConfirmButton: false
+    });
+
+    socket.emit('closeGame' , {
+        gameId : data.game.id
+    })
+
+    setTimeout(function(){
+        window.location.href ='lobby';
+
+    },7000);
+
+
+});
+
+socket.on('noMoreLivesForYou' , function(data){
+
+    Swal.fire({
+        title: 'Sorry, out of lives',
+        text: 'You have lost the game!',
+        icon: 'error',
+        showConfirmButton: false
+    });
+
+    socket.emit('closeGame' , {
+        gameId : data.game.id
+    })
+
+    setTimeout(function(){
+        window.location.href ='lobby';
+
+    },7000);
+})
+
+
 
 
 window.addEventListener('beforeunload', () => {
@@ -535,6 +471,75 @@ function updatePlayerClicksLeft(player, updatedClicks) {
 
 }
 
+
+function onNoMoreClickLeft(game){
+
+    const creatorScore = game.creator.score;
+    const creatorName = (game.creator.name).toUpperCase();
+
+    const joinerScore = game.joiner.score;
+    const joinerName = (game.joiner.name).toUpperCase();
+
+    var highestPlayerObject= {};
+    var lowestPlayerObject = {};
+
+    if(creatorScore > joinerScore){
+        highestPlayerObject = {
+            score : creatorScore ,
+            name : creatorName
+        };
+
+        lowestPlayerObject = {
+            score : joinerScore ,
+            name : joinerName
+        }
+
+
+
+
+    }else if(creatorScore < joinerScore){
+        lowestPlayerObject = {
+            score : creatorScore ,
+            name : creatorName
+        };
+
+        highestPlayerObject = {
+            score : joinerScore ,
+            name : joinerName
+        }
+
+    }else{
+        Swal.fire({
+            icon : 'info' ,
+            title: 'Game Ended',
+            text : `The two players have the same score : ${highestPlayerObject.score}`,
+            showConfirmButton: false
+        })
+
+        socket.emit('closeGame' , {
+            gameId : game.id
+        })
+        return null;
+    }
+
+    Swal.fire({
+        icon : 'info' ,
+        title: 'Game Ended',
+        html: '<pre>' + `The winner:<span style="font-weight: bold"> ${highestPlayerObject.name}</span><br>Score : <span style="font-weight: bold">${highestPlayerObject.score}</span> ` + '</pre>',
+        showConfirmButton: false
+
+    })
+
+    socket.emit('closeGame' , {
+        gameId : game.id
+    });
+
+    setTimeout(function(){
+        window.location.href='lobby';
+    } , 5000);
+
+
+}
 
 // redirecting to lobby and delete the game if the user reload the page
 

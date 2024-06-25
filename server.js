@@ -45,7 +45,6 @@ mongoose.connect(`${process.env.DATABASE_URI}/Minesweeper`).then((conn) => {
 });
 
 
-
 let games = [];
 
 
@@ -66,7 +65,7 @@ io.on('connection', (socket) => {
 
         if (!gameExists) {
             var game = new MinesweeperGame();
-            game.creator = new Player(playerId , 'creator' , creatorObject.creator);
+            game.creator = new Player(playerId, 'creator', creatorObject.creator);
 
             games.push(game);
             socket.join(game.id);
@@ -82,44 +81,6 @@ io.on('connection', (socket) => {
 
 
     });
-
-    // socket.on('updateClicksLeft' , (data)=>{
-    //
-    //     let game = getGameById(data.gameId);
-    //     let player = data.player;
-    //
-    //     if(data.deduct){
-    //
-    //         if(player === 'creator'){
-    //             game.creatorClicksLeft -= 1;
-    //             // if(game.creatorClicksLeft <= 0){
-    //             //     io.to(data.gameId).emit('ranOfClicks' , {
-    //             //         message : 'No more clicks',
-    //             //         player : 'creator'
-    //             //     })
-    //             //     closeAGame(game.id);
-    //             // }
-    //         }else if(player === 'joiner'){
-    //             game.joinerClicksLeft -= 1;
-    //             // if(game.joinerClicksLeft <= 0){
-    //             //
-    //             //     io.to(data.gameId).emit('ranOfClicks' , {
-    //             //         message : 'No more clicks',
-    //             //         player : 'creator'
-    //             //     })
-    //             //     closeAGame(game.id);
-    //             // }
-    //         }
-    //     }
-    //
-    //
-    //
-    // io.to(data.gameId).emit('updateGameInfo' , {
-    //     game
-    // })
-    //
-    // });
-
 
     socket.on('join', (data) => {
 
@@ -138,7 +99,7 @@ io.on('connection', (socket) => {
                 if (game.size === 1 && !game.closed) {
                     socket.join(data.gameId);
                     currentGame.closed = true;
-                    currentGame.joiner = new Player(socket.id , 'joiner' , data.joiner);
+                    currentGame.joiner = new Player(socket.id, 'joiner', data.joiner);
                     io.to(currentGame.id).emit('gameJoinedSuccessfully', {
                         game: currentGame
                     });
@@ -164,9 +125,9 @@ io.on('connection', (socket) => {
 
     });
 
-    socket.on('toto' , (data)=>{
-        io.to(data.playerId).emit('totoz' , {
-            message : 'hello there'
+    socket.on('toto', (data) => {
+        io.to(data.playerId).emit('totoz', {
+            message: 'hello there'
         });
     })
 
@@ -177,50 +138,81 @@ io.on('connection', (socket) => {
         let value;
         let currentGame;
         const hashedPlayerType = data.hashedPlayerType;
-        const clickedByJoiner = await bcrypt.compare('joiner' , hashedPlayerType);
+        const clickedByJoiner = await bcrypt.compare('joiner', hashedPlayerType);
         var clicker;
 
-        if(clickedByJoiner){
+        if (clickedByJoiner) {
             clicker = 'joiner';
-        }else{
+        } else {
             clicker = 'creator';
         }
 
         games.forEach(game => {
             if (game.id === gameId) {
 
-                if(game.checkPlayerClicks(clicker)){
+                if (game.checkPlayerClicks(clicker)) {
+
+
+                    if (game.nextClicker === clicker) {
+
+
+                        value = game.returnThenRemoveAnObject(squareId, clicker);
+
+                        currentGame = game;
+                        io.to(data.gameId).emit('receiveSquareContent', {
+                            value,
+                            squareId,
+                            currentGame
+                        });
+
+                        // check if the click ran out of lives
+                        if(!game.checkPlayerLives(clicker)){
+
+                            if(clicker === 'creator'){
+
+                                io.to(game.creator.id).emit('noMoreLivesForYou' , {
+                                    game
+                                });
+                                io.to(game.joiner.id).emit('noMoreLivesForOpp' , {
+                                    game
+                                });
 
 
 
-                if(game.nextClicker === clicker){
+                            }else if(clicker === 'joiner'){
+                                io.to(game.joiner.id).emit('noMoreLivesForYou' , {
+                                    game
+                                });
+                                io.to(game.creator.id).emit('noMoreLivesForOpp' , {
+                                    game
+                                });
 
 
+                            }
 
-                    value = game.returnThenRemoveAnObject(squareId ,clicker);
-
-                    currentGame = game;
-                    io.to(data.gameId).emit('receiveSquareContent', {
-                        value,
-                        squareId,
-                        currentGame
-                    });
-
-                }else{
+                        }
 
 
-                    socket.emit('notYourClick');
-                }
-            }else{
-                    // io.to().emit('noMoreClicks');
+                        // when the joiner runs out of clicks that mean the same for creator because they both have the same number of clicks
+                        if (!game.joiner.clicksLeft) {
+                            setTimeout(() => {
+                                io.to(game.id).emit('noClicksLeft', {
+                                    message: 'No clicks left for both players',
+                                    game
+                                });
+                            }, 1000);
+                        }
+
+                    } else {
+                        socket.emit('notYourClick');
+                    }
+                } else {
                     console.log(`The ${clicker} ran out of clicks`);
                 }
             }
 
 
         });
-
-
 
 
     });
@@ -249,15 +241,14 @@ io.on('connection', (socket) => {
         });
 
 
-        if(!data.noMoreLives && data.refreshed ){
+        if (!data.noMoreLives && data.refreshed) {
 
             io.to(data.gameId).emit('gameIsClosed', {
                 message: 'You won, Your opponent left the game!',
-                player : data.player
+                player: data.player
             });
 
         }
-
 
 
     })
@@ -304,26 +295,23 @@ app.post('/game', async (req, res) => {
     const gameId = req.body.gameId;
 
     const saltRounds = 10;
-    var hashedPlayerType ;
-
-
-
+    var hashedPlayerType;
 
 
     if (joiner) {
         let gameToJoin = games.find(game => game.id === gameId);
-        hashedPlayerType = await bcrypt.hash('joiner' , saltRounds);
+        hashedPlayerType = await bcrypt.hash('joiner', saltRounds);
         if (!gameToJoin) {
 
             return res.json({'Error': 'No game found with the provided ID'});
         }
-    }else{
+    } else {
 
-        hashedPlayerType = await bcrypt.hash('creator' , saltRounds);
+        hashedPlayerType = await bcrypt.hash('creator', saltRounds);
 
     }
 
-    res.render('game', {creator, joiner, gameId , hashedPlayerType });
+    res.render('game', {creator, joiner, gameId, hashedPlayerType});
 });
 
 

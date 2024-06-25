@@ -5,8 +5,9 @@ class Player{
         this.type = type;
         this.name = name;
         this.score = 0;
-        this.lives = 3;
-        this.clicksLeft = 10;
+        this.lives = 2;
+        this.clicksLeft = 20;
+
     }
 
     addLife() {
