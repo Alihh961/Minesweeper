@@ -12,9 +12,9 @@ const {requireAuth, userIsAuthenticated} = require('./middleware/authMiddleware'
 const http = require('http');
 const socketIO = require('socket.io');
 
-const dotenv = require('dotenv');
-dotenv.config({path: './config.env'}); // it must before the declaration of app
+const dotenv = require('dotenv').config();// it must before the declaration of app
 const mongoose = require('mongoose');
+
 
 const app = express();
 let server = http.createServer(app);

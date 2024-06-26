@@ -129,18 +129,8 @@ socket.on('notYourClick' , function(data){
         title : "Wait" ,
         text : "It is not your turn yet!"
     })
-})
-
-
-document.querySelector('.coucou').addEventListener('click' , ()=>{
-    socket.emit('toto' , {
-        playerId : window.game.creatorId
-    });
 });
 
-socket.on('totoz' , (data)=>{
-    console.log(data.message)
-})
 
 socket.on('receiveSquareContent', function (data) {
 
@@ -159,7 +149,6 @@ socket.on('receiveSquareContent', function (data) {
     if (clickedSquare) {
 
 window.game = data.currentGame;
-console.log(data.currentGame);
 
         if (typeof (value) === "number") {
             clickedSquare.innerHTML = data.value;
