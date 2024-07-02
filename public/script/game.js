@@ -42,7 +42,6 @@ socket.on('gameCreatedSuccessfully', function (data) {
 
     window.game = data.game;
 
-
 });
 
 // starting the game
@@ -50,6 +49,7 @@ socket.on('gameJoinedSuccessfully', function (data) {
     document.body.style.pointerEvents = 'auto';
     document.body.classList.remove('game-not-started');
     document.querySelector('.msg-game-not-started').remove();
+
 
     window.game = data.game;
     const msgCreatorClickFirst = document.querySelector('.game-main-section .msg-creator-start-first');
@@ -67,7 +67,9 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
         squaresContainer.appendChild(span);
     }
-    updatePlayersInfo(data.game);
+    socket.emit('askingForPlayersInfoToUpdateOnScreen', {
+        game : data.game
+    })
 
 
     var squares = document.querySelectorAll('.square');
@@ -113,7 +115,24 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
 });
 
-socket.on('errorCreatingGame', (error) => {
+
+socket.on('toggleTurnOnScreen' , function(data){
+
+    const containers = document.querySelectorAll('.players-info-container');
+
+    if(data.turn === 'mine'){
+        containers[1].classList.add('his-turn');
+        containers[0].classList.remove('his-turn');
+
+    }else if(data.turn === 'his'){
+
+        containers[0].classList.add('his-turn');
+        containers[1].classList.remove('his-turn');
+
+    }
+})
+
+socket.on('errorCreatingGame', function(error){
     Swal.fire({
         icon: "error",
         text: "A game already running for " + loggedUser,
@@ -130,49 +149,28 @@ socket.on('notYourClick' , function(data){
     })
 });
 
-
 socket.on('receiveSquareContent', function (data) {
-
-
-    const creatorLives = data.currentGame.creator.lives;
-    const joinerLives = data.currentGame.joiner.lives;
-
 
 
     let clickedSquare = document.querySelector(`[data-square="${data.squareId}"]`);
     let value = data.value;
 
-    if (clickedSquare) {
+    if (clickedSquare && !clickedSquare.classList.contains('opened')) {
 
 window.game = data.currentGame;
 
         if (typeof (value) === "number") {
             clickedSquare.innerHTML = data.value;
-
-            if (!clickedSquare.classList.contains('opened')) {
-                clickedSquare.classList.add('joiner');
-
-            }
-
             clickedSquare.classList.add('opened');
 
 
         } else if (value === "-") {
-            if (!clickedSquare.classList.contains('opened')) {
-                clickedSquare.classList.add('joiner');
-
-            }
             clickedSquare.classList.add('mine');
             clickedSquare.innerHTML = "\u26CC";
             clickedSquare.classList.add('opened');
 
-
         } else if (value === "+") {
 
-            if (!clickedSquare.classList.contains('opened')) {
-                clickedSquare.classList.add('joiner');
-
-            }
             clickedSquare.classList.add('heart');
             clickedSquare.innerHTML = "\u2665";
             clickedSquare.classList.add('opened');
@@ -182,7 +180,14 @@ window.game = data.currentGame;
             console.error("Error while adding content to a square")
         }
 
-        updatePlayersInfo(data.currentGame);
+        // adding red color for squares click by opp
+        if(data.cssClass){
+            clickedSquare.classList.add(data.cssClass);
+        }
+
+        socket.emit('askingForPlayersInfoToUpdateOnScreen' , {
+            game : data.currentGame
+        })
 
     }else{
         socket.emit('closeGame' , {
@@ -223,7 +228,7 @@ socket.on('noMoreLivesForOpp' , function(data){
     setTimeout(function(){
         window.location.href ='lobby';
 
-    },7000);
+    },2500);
 
 
 });
@@ -244,10 +249,8 @@ socket.on('noMoreLivesForYou' , function(data){
     setTimeout(function(){
         window.location.href ='lobby';
 
-    },7000);
+    },2500);
 })
-
-
 
 
 window.addEventListener('beforeunload', () => {
@@ -317,35 +320,27 @@ socket.on('ranOfClicks' , function(data){
     })
 })
 
+socket.on('updatePlayersInfoOnScreen' , function(data){
 
-function updatePlayersInfo(game) {
-    const creator = game.creator;
-    const joiner = game.joiner;
-
-    console.log(game);
-
-    if (window.player.type === 'joiner') {
-
-        document.querySelector('.your-lives span').textContent = joiner.lives;
-        document.querySelector('.your-score span').textContent = joiner.score;
-        document.querySelector('.opp-lives span').textContent = creator.lives;
-        document.querySelector('.opp-score span').textContent = creator.score;
-        document.querySelector('.opp-clicks-left').textContent = creator.clicksLeft;
-        document.querySelector('.your-clicks-left').textContent = joiner.clicksLeft;
-
-
-    } else if (window.player.type === 'creator') {
-
-        document.querySelector('.your-lives span').textContent = creator.lives;
-        document.querySelector('.your-score span').textContent = creator.score;
-        document.querySelector('.opp-lives span').textContent = joiner.lives;
-        document.querySelector('.opp-score span').textContent = joiner.score;
-        document.querySelector('.opp-clicks-left').textContent = joiner.clicksLeft;
-        document.querySelector('.your-clicks-left').textContent = creator.clicksLeft;
-
-    } else {
-        console.log('Error updating lives and scores');
+    if(data.yourInfo && data.oppInfo){
+        updatePlayersInfoOnScreen(data);
     }
+
+
+});
+
+
+function updatePlayersInfoOnScreen(info) {
+
+    const yourInfo = info.yourInfo;
+    const oppInfo = info.oppInfo;
+
+    document.querySelector('.your-lives span').textContent = yourInfo.lives;
+    document.querySelector('.your-score span').textContent = yourInfo.score;
+    document.querySelector('.your-clicks-left').textContent = yourInfo.clicksLeft;
+    document.querySelector('.opp-lives span').textContent = oppInfo.lives;
+    document.querySelector('.opp-score span').textContent = oppInfo.score;
+    document.querySelector('.opp-clicks-left').textContent = oppInfo.clicksLeft;
 
 
 }
@@ -406,7 +401,6 @@ function changeClicksLeft(player) {
             if (window.player.type === 'joiner') {
 
 
-                console.log({joinerClicksLeft});
                 joinerClicksLeft = +joinerClicksLeft - 1;
 
                 socket.emit('updateClicksLeft', {
@@ -520,7 +514,7 @@ function onNoMoreClickLeft(game){
 
     setTimeout(function(){
         window.location.href='lobby';
-    } , 5000);
+    } , 2500);
 
 
 }

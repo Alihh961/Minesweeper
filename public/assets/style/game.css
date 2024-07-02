@@ -69,6 +69,36 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     justify-content: center;
     align-items: center;
     gap: 5px;
+    position: relative;
+}
+
+.his-turn.players-info-container:before{
+    font-family: "Font Awesome 5 Free";
+    content: "\f0a4";
+    display: inline-block;
+    padding-right: 3px;
+    vertical-align: middle;
+    font-weight: 900;
+    position: absolute;
+    width: fit-content;
+    left: -15%;
+    color: white;
+    font-size: 30px;
+    -webkit-animation: fa-move 2s infinite;
+    -o-animation: fa-move 2s infinite;
+    animation: fa-move 2s infinite;
+}
+
+@keyframes fa-move {
+    0% {
+        left: -15%;
+    }
+    50%{
+        left: -23%;
+    }
+    100%{
+        left: -15%;
+    }
 }
 
 .game-main-section .players-info {
@@ -83,19 +113,6 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
 
 }
 
-/*.game-main-section .players-info-container:nth-of-type(2) .players-info{*/
-/*    border-top-left-radius: 5px;*/
-/*    border-top-right-radius: 5px;*/
-/*    border-top: 2px solid black;*/
-
-/*}*/
-
-/*.game-main-section .players-info-container:nth-of-type(1) .players-info{*/
-/*    border-bottom-left-radius: 5px;*/
-/*    border-bottom-right-radius: 5px;*/
-/*    border-bottom: 2px solid black;*/
-
-/*}*/
 
 .game-main-section .players-info.your-info{
     background: linear-gradient(5deg, #0c7e0c, #5bda66);
@@ -141,7 +158,7 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     cursor: pointer;
     border: 2px outset #ececec;
     text-align: center;
-    font-weight: 900;
+    font-weight: 700;
     font-size: 20px;
 }
 
@@ -160,14 +177,14 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
 }
 
 .game-main-section .mines-container span.square.opened {
-    background-color: #a6a4a4;
+    background: linear-gradient(5deg, #8ab38a, #2dd53c);
     border: solid #222222;
     border-width: 0 1px 1px 0;
     pointer-events: none;
 }
 
-.game-main-section .mines-container span.square.opened.joiner {
-    background-color: #d88484 !important;
+.game-main-section .mines-container span.square.opened.byOpp {
+    background: linear-gradient(5deg, #d79191, #da5b5b)!important;
 }
 
 .game-main-section .msg-creator-start-first{
@@ -207,66 +224,3 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
 
 }
 
-
-
-<!-- time counter -->
-
-.time{
-    width: 50px;
-    height: 50px;
-}
-
-   .base-timer {
-       position: relative;
-       width: 50px;
-       height: 50px;
-   }
-
-.base-timer__svg {
-    transform: scaleX(-1);
-}
-
-.base-timer__circle {
-    fill: none;
-    stroke: none;
-}
-
-.base-timer__path-elapsed {
-    stroke-width: 7px;
-    stroke: grey;
-}
-
-.base-timer__path-remaining {
-    stroke-width: 7px;
-    stroke-linecap: round;
-    transform: rotate(90deg);
-    transform-origin: center;
-    transition: 1s linear all;
-    fill-rule: nonzero;
-    stroke: currentColor;
-}
-
-.base-timer__path-remaining.green {
-    color: rgb(65, 184, 131);
-}
-
-.base-timer__path-remaining.orange {
-    color: orange;
-}
-
-.base-timer__path-remaining.red {
-    color: red;
-}
-
-.base-timer__label {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: white;
-    font-family: sans-serif;
-}
