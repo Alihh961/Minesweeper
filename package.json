@@ -3,8 +3,12 @@
   "version": "1.0.0",
   "description": "Multiplayer Minesweeper game using Node.js, MongoDB, and WebSocket technology for real-time interaction.",
   "main": "server.js",
+  "engines": {
+    "node" : "14.x"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
