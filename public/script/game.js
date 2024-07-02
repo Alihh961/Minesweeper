@@ -3,7 +3,7 @@ let socket = io();
 
 document.body.style.overflow = 'hidden';
 
-window.player = {};
+
 
 const creator = document.querySelector("input[name='creator']").value;
 const joiner = document.querySelector("input[name='joiner']").value;
@@ -12,20 +12,14 @@ const loggedUser = document.querySelector("input[name='loggedUser']").value;
 
 
 if (creator) {
-
     socket.emit('createAGame', {
         creator: creator,
         jwt : getCookie('jwt')
     });
-    window.player.type = 'creator';
-
     document.body.style.pointerEvents = 'none';
     document.body.classList.add('game-not-started');
-
-
 } else if (joiner) {
     socket.emit('join', {joiner: loggedUser, gameId: gameId , jwt : getCookie('jwt')});
-    window.player.type = 'joiner';
 } else {
     window.location.href = '/lobby';
 }
@@ -40,7 +34,7 @@ socket.on('errorJoiningAGame', function (error) {
 })
 socket.on('gameCreatedSuccessfully', function (data) {
 
-    window.game = data.game;
+    window.gameId = data.game.id;
 
 });
 
@@ -51,7 +45,8 @@ socket.on('gameJoinedSuccessfully', function (data) {
     document.querySelector('.msg-game-not-started').remove();
 
 
-    window.game = data.game;
+    window.gameId = data.gameId;
+
     const msgCreatorClickFirst = document.querySelector('.game-main-section .msg-creator-start-first');
 
     msgCreatorClickFirst.classList.add('fadeOut');
@@ -67,8 +62,9 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
         squaresContainer.appendChild(span);
     }
+
     socket.emit('askingForPlayersInfoToUpdateOnScreen', {
-        game : data.game
+        gameId : window.gameId
     })
 
 
@@ -82,28 +78,16 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
                 document.querySelector('.msg-creator-start-first').style.display = 'none';
 
-                if(window.player.type === 'joiner' || window.player.type === 'creator'){
                     // Emit the squareClicked event to the server
                     socket.emit('squareClicked', {
                         message: 'A square was clicked!',
                         squareId,
-                        gameId: window.game.id,
+                        gameId: window.gameId,
                         jwt : getCookie('jwt')
 
                     });
 
-                }else{
-                    socket.emit('closeGame' , {
-                        gameId
-                    })
-                    Swal.fire({
-                        icon : 'error',
-                        title : 'Error' ,
 
-                    }).then(function(){
-                        window.location.href ='lobby';
-                    })
-                }
 
 
 
@@ -157,7 +141,6 @@ socket.on('receiveSquareContent', function (data) {
 
     if (clickedSquare && !clickedSquare.classList.contains('opened')) {
 
-window.game = data.currentGame;
 
         if (typeof (value) === "number") {
             clickedSquare.innerHTML = data.value;
@@ -186,12 +169,12 @@ window.game = data.currentGame;
         }
 
         socket.emit('askingForPlayersInfoToUpdateOnScreen' , {
-            game : data.currentGame
+            gameId : window.gameId
         })
 
     }else{
         socket.emit('closeGame' , {
-            gameId : window.game.id
+            gameId : window.gameId
         });
 
         Swal.fire({
@@ -205,11 +188,11 @@ window.game = data.currentGame;
     }
 });
 
-
 // when there is no clicks this event will be executed 2 seconds after the last click
 socket.on('noClicksLeft' , function (data){
 
-    onNoMoreClickLeft(data.game);
+    onNoMoreClickLeft(data.message);
+
 });
 
 socket.on('noMoreLivesForOpp' , function(data){
@@ -222,7 +205,7 @@ socket.on('noMoreLivesForOpp' , function(data){
     });
 
     socket.emit('closeGame' , {
-        gameId : data.game.id
+        gameId : data.gameId
     })
 
     setTimeout(function(){
@@ -243,7 +226,7 @@ socket.on('noMoreLivesForYou' , function(data){
     });
 
     socket.emit('closeGame' , {
-        gameId : data.game.id
+        gameId : data.gameId
     })
 
     setTimeout(function(){
@@ -252,13 +235,11 @@ socket.on('noMoreLivesForYou' , function(data){
     },2500);
 })
 
-
 window.addEventListener('beforeunload', () => {
-    if (window.game.id) {
-        let player = window.player.type;
+    if (window.gameId) {
         socket.emit('closeGame', {
-            gameId: window.game.id,
-            message: 'close the game of id ' + window.game.id,
+            gameId: window.gameId,
+            message: 'close the game of id ' + window.gameId,
             jwt : getCookie('jwt'),
             refreshed: true
         });
@@ -274,10 +255,8 @@ if (gameId) {
 
 }
 
-
 socket.on('setGameById', (data) => {
-    window.game = data.game;
-
+    window.gameId = data.gameId
 });
 
 // show won message when the opponent leaves the game
@@ -307,11 +286,6 @@ socket.on('gameIsClosed', function (data) {
 
 });
 
-socket.on('updateGameInfo', (data) => {
-    window.game = data.game;
-
-})
-
 socket.on('ranOfClicks' , function(data){
     Swal.fire({
         icon : 'info' ,
@@ -330,6 +304,8 @@ socket.on('updatePlayersInfoOnScreen' , function(data){
 });
 
 
+
+
 function updatePlayersInfoOnScreen(info) {
 
     const yourInfo = info.yourInfo;
@@ -345,176 +321,18 @@ function updatePlayersInfoOnScreen(info) {
 
 }
 
+function onNoMoreClickLeft(message){
 
-function changeClicksLeft(player) {
-
-
-
-        if (player === 'creator') {
-
-            // when we emit deductClicks event the server will update the game info in the server and
-            // emit the updated game object using the event updateGameInfo
-            var creatorClicksLeft = window.game.creator.clicksLeft;
-
-            if (window.player.type === 'creator') {
-
-
-                creatorClicksLeft = +creatorClicksLeft - 1;
-
-                socket.emit('updateClicksLeft', {
-                    gameId: window.game.id,
-                    player,
-                    deduct: true
-
-                });
-
-
-                if (creatorClicksLeft <= -1) {
-                    return;
-                }
-                updatePlayerClicksLeft(player, creatorClicksLeft);
-
-            } else if (window.player.type === 'joiner') {
-
-                creatorClicksLeft = +creatorClicksLeft - 1;
-
-                //request the updated game object without any another deduction,
-                // the deduction happened when the player type is a creator
-                socket.emit('updateClicksLeft', {
-                    gameId: window.game.id,
-                    deduct: false
-                });
-
-
-                if (creatorClicksLeft <= -1) {
-                    return;
-                }
-                updatePlayerClicksLeft(player, creatorClicksLeft);
-
-            }
-        } else if (player === 'joiner') {
-
-            // when we emit deductClicks event the server will update the game info in the server and
-            // emit the updated game object using the event updateGameInfo
-            var joinerClicksLeft = window.game.joinerClicksLeft;
-
-            if (window.player.type === 'joiner') {
-
-
-                joinerClicksLeft = +joinerClicksLeft - 1;
-
-                socket.emit('updateClicksLeft', {
-                    gameId: window.game.id,
-                    player,
-                    deduct: true
-
-                });
-
-
-                if (joinerClicksLeft <= -1) {
-                    return;
-                }
-                updatePlayerClicksLeft(player, joinerClicksLeft);
-
-            } else if (window.player.type === 'creator') {
-
-                joinerClicksLeft = +joinerClicksLeft - 1;
-
-                //request the updated game object without any another deduction,
-                // the deduction happened when the player type is a creator
-                socket.emit('updateClicksLeft', {
-                    gameId: window.game.id,
-                    deduct: false
-                });
-
-
-                if (joinerClicksLeft <= -1) {
-                    return;
-                }
-                updatePlayerClicksLeft(player, joinerClicksLeft);
-
-            }
-        }
-
-
-    }
-
-function updatePlayerClicksLeft(player, updatedClicks) {
-    if (player === window.player.type) {
-        document.querySelector('.your-clicks-left').textContent = updatedClicks;
-    } else {
-        document.querySelector('.opp-clicks-left').textContent = updatedClicks;
-    }
-
-
-}
-
-
-function onNoMoreClickLeft(game){
-
-    const creatorScore = game.creator.score;
-    const creatorName = (game.creator.name).toUpperCase();
-
-    const joinerScore = game.joiner.score;
-    const joinerName = (game.joiner.name).toUpperCase();
-
-    var highestPlayerObject= {};
-    var lowestPlayerObject = {};
-
-    if(creatorScore > joinerScore){
-        highestPlayerObject = {
-            score : creatorScore ,
-            name : creatorName
-        };
-
-        lowestPlayerObject = {
-            score : joinerScore ,
-            name : joinerName
-        }
-
-
-
-
-    }else if(creatorScore < joinerScore){
-        lowestPlayerObject = {
-            score : creatorScore ,
-            name : creatorName
-        };
-
-        highestPlayerObject = {
-            score : joinerScore ,
-            name : joinerName
-        }
-
-    }else{
         Swal.fire({
-            icon : 'info' ,
-            title: 'Game Ended',
-            text : `The two players have the same score : ${highestPlayerObject.score}`,
+            icon : message.icon ,
+            title: message.title,
+            html : message.html,
             showConfirmButton: false
         })
 
-        socket.emit('closeGame' , {
-            gameId : game.id
-        })
-        return null;
-    }
-
-    Swal.fire({
-        icon : 'info' ,
-        title: 'Game Ended',
-        html: '<pre>' + `The winner:<span style="font-weight: bold"> ${highestPlayerObject.name}</span><br>Score : <span style="font-weight: bold">${highestPlayerObject.score}</span> ` + '</pre>',
-        showConfirmButton: false
-
-    })
-
-    socket.emit('closeGame' , {
-        gameId : game.id
-    });
-
     setTimeout(function(){
         window.location.href='lobby';
-    } , 2500);
+    } , 3000)
 
 
 }
@@ -527,9 +345,6 @@ function getCookie(name) {
     })
     return cookie[name];
 }
-
-
-
 
 
 // redirecting to lobby and delete the game if the user reload the page

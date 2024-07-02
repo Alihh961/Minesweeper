@@ -19,6 +19,7 @@ const handleJwt = async (jwtToken) => {
 
 
 function socketServer(io, games) {
+
     io.on('connection', (socket) => {
 
         const playerId = socket.id;
@@ -96,7 +97,7 @@ function socketServer(io, games) {
                             currentGame.joiner = new Player(socket.id, 'joiner', data.joiner, data.jwt);
 
                             io.to(currentGame.id).emit('gameJoinedSuccessfully', {
-                                game: currentGame
+                                gameId: currentGame.id
                             });
 
                             toggleTurnOnScreen(currentGame);
@@ -175,10 +176,11 @@ function socketServer(io, games) {
                                 if (clickerType === 'creator') {
 
                                     io.to(game.creator.id).emit('noMoreLivesForYou', {
-                                        game
+                                        gameId: game.id
                                     });
                                     io.to(game.joiner.id).emit('noMoreLivesForOpp', {
-                                        game
+                                        gameId: game.id
+
                                     });
 
 
@@ -198,10 +200,10 @@ function socketServer(io, games) {
                             // when the joiner runs out of clicks that mean the same for creator because they both have the same number of clicks
                             if (!game.joiner.clicksLeft) {
                                 setTimeout(() => {
-                                    io.to(game.id).emit('noClicksLeft', {
-                                        message: 'No clicks left for both players',
-                                        game
-                                    });
+
+
+                                    checkWinnerAndCloseTheGame(game);
+
                                 }, 1000);
                             }
 
@@ -212,8 +214,6 @@ function socketServer(io, games) {
                         console.log(`The ${clickerType} ran out of clicks`);
                     }
                 }
-
-
             });
 
 
@@ -225,8 +225,10 @@ function socketServer(io, games) {
             })
         });
 
-        socket.on('askingForPlayersInfoToUpdateOnScreen', (data)=>{
-            const game = data.game;
+        socket.on('askingForPlayersInfoToUpdateOnScreen', (data) => {
+            const gameId = data.gameId;
+
+            const game = getGameById(gameId);
             updatePlayersInfoOnScreen(game);
         })
 
@@ -235,7 +237,7 @@ function socketServer(io, games) {
             const currentGame = getGameById(data.id);
 
             io.to(currentGame.id).emit('setGameById', {
-                game: currentGame
+                gameId: currentGame.id
             })
         })
 
@@ -317,31 +319,99 @@ function socketServer(io, games) {
 
             const creatorInfo = {
                 lives: game.creator.lives,
-                score : game.creator.score,
-                clicksLeft : game.creator.clicksLeft
+                score: game.creator.score,
+                clicksLeft: game.creator.clicksLeft
             };
             const joinerInfo = {
                 lives: game.joiner.lives,
-                score : game.joiner.score,
-                clicksLeft : game.joiner.clicksLeft
+                score: game.joiner.score,
+                clicksLeft: game.joiner.clicksLeft
             };
 
-            io.to(game.creator.id).emit('updatePlayersInfoOnScreen' , {
-                yourInfo : creatorInfo,
-                oppInfo : joinerInfo
+            io.to(game.creator.id).emit('updatePlayersInfoOnScreen', {
+                yourInfo: creatorInfo,
+                oppInfo: joinerInfo
             });
 
-            io.to(game.joiner.id).emit('updatePlayersInfoOnScreen' , {
-                yourInfo : joinerInfo,
-                oppInfo : creatorInfo
+            io.to(game.joiner.id).emit('updatePlayersInfoOnScreen', {
+                yourInfo: joinerInfo,
+                oppInfo: creatorInfo
             });
 
 
+        }
+
+        function checkWinnerAndCloseTheGame(game) {
+            const joinerScore = game.joiner.score;
+            const creatorScore = game.creator.score;
+            const comparison = joinerScore > creatorScore ? 'joiner' : (creatorScore > joinerScore ? 'creator' : 'tie');
+
+            switch (comparison) {
+                case 'joiner': {
+                    io.to(game.joiner.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'Congratulations!',
+                            html: '<pre>' + `Your score : <span style="font-weight: bold">${joinerScore}</span> ` +
+                                `Opp score :<span style="font-weight: bold">${creatorScore}</span>` + '</pre>',
+                        },
+                    });
+
+                    io.to(game.creator.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'You have lost!',
+                            html: '<pre>' + `Your score : <span style="font-weight: bold">${creatorScore}</span> ` +
+                                `Opp score :<span style="font-weight: bold">${joinerScore}</span>` + '</pre>',
+                        },
+                    });
+                    break;
+                }
+                case 'creator': {
+
+                    io.to(game.creator.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'Congratulations!',
+                            html: '<pre>' + `Your score : <span style="font-weight: bold">${creatorScore}</span> ` +
+                                `Opp score :<span style="font-weight: bold">${joinerScore}</span>` + '</pre>',
+                        },
+                    });
+
+                    io.to(game.joiner.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'You have lost!',
+                            html: '<pre>' + `Your score : <span style="font-weight: bold">${joinerScore}</span> ` +
+                                `Opp score :<span style="font-weight: bold">${creatorScore}</span>` + '</pre>',
+                        },
+                    });
+                    break;
+                }
+                case 'tie': {
+
+                    io.to(game.creator.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'It\'s a tie!',
+                            html: '<pre>' + `Both players have the same score: <span style="font-weight: bold">${creatorScore}</span>` + '</pre>',
+                        },
+                    });
+
+                    io.to(game.joiner.id).emit('noClicksLeft', {
+                        message: {
+                            icon: 'info',
+                            title: 'It\'s a tie!',
+                            html: '<pre>' + `Both players have the same score: <span style="font-weight: bold">${joinerScore}</span>` + '</pre>',
+                        },
+                    });
+                    break;
+                }
+            }
         }
 
 
     })
 }
 
-
-module.exports = {socketServer};
+module.exports = {socketServer}

@@ -2,13 +2,6 @@ const express = require('express');
 const path = require('path');
 const userRouter = require('./routes/UserRouter');
 const cookieParser = require('cookie-parser');
-let MinesweeperGame = require('./classes/MinesweeperGame');
-
-
-
-let Player = require('./classes/Player');
-
-
 const { userIsAuthenticated} = require('./middleware/authMiddleware');
 const http = require('http');
 const socketIO = require('socket.io');
