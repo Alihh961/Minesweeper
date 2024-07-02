@@ -2,12 +2,21 @@
 
 <header>
     <% if(user) { %>
-        <h3>You are logged in as <%= user.userName %></h3>
+    <div>
+        <p><%= user.userName.charAt(0).toUpperCase() + user.userName.slice(1).toLowerCase() %></p>
 
-        <a href="user/logout"> logout</a>
+    </div>
+
+        <h3><%= pageTitle %></h3>
+
+        <span>
+        <a href="user/logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+
+        </span>
+
         <input type="hidden" value="<%= user.userName %>" name="loggedUser"/>
+        <% } %>
 </header>
 
 
 
-<% } %>

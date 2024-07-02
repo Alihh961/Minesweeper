@@ -83,26 +83,32 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
 
 }
 
-.game-main-section .players-info:nth-of-type(2){
-    border-top-left-radius: 5px;
-    border-top-right-radius: 5px;
-    border-top: 2px solid black;
+/*.game-main-section .players-info-container:nth-of-type(2) .players-info{*/
+/*    border-top-left-radius: 5px;*/
+/*    border-top-right-radius: 5px;*/
+/*    border-top: 2px solid black;*/
 
-}
+/*}*/
 
-.game-main-section .players-info:nth-of-type(1){
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-    border-bottom: 2px solid black;
+/*.game-main-section .players-info-container:nth-of-type(1) .players-info{*/
+/*    border-bottom-left-radius: 5px;*/
+/*    border-bottom-right-radius: 5px;*/
+/*    border-bottom: 2px solid black;*/
 
-}
+/*}*/
 
 .game-main-section .players-info.your-info{
     background: linear-gradient(5deg, #0c7e0c, #5bda66);
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-bottom: 2px solid black;
 }
 
 .game-main-section .players-info.opp-info{
     background: linear-gradient(5deg, #e31818, #da5b5b);
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border-top: 2px solid black;
 }
 .game-main-section .players-info h4.clicks-left {
 
@@ -174,6 +180,8 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     border-radius: 15px;
     background: linear-gradient(45deg, #6f8a83, #4a4a35);
     display: none;
+    max-width: 97%;
+    text-align: center;
 }
 
 .game-main-section .msg-creator-start-first.fadeOut{

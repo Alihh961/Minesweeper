@@ -1,16 +1,60 @@
 header{
     width: 100%;
-    padding: 10px;
-    background-color: #fff;
+    padding: 15px 10px;
+    background:linear-gradient(#71719c, #bbeeff);
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
-h2{
-    display: block;
-    width: 100%;
-    margin: auto;
-    background: white;
+header >* {
+    flex: 1;
+}
+
+header p{
+    font-weight: 700;
+    font-family: sans-serif;
+    width: fit-content;
+    min-width: 60px ;
+    max-width: 150px;
+    background-color: #13ab13;
     text-align: center;
+    padding: 5px;
+    border-radius: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
+header h3{
+    text-align: center;
+}
+
+header span{
+    min-width: 108px;
+}
+
+
+header a{
+    padding: 5px 10px;
+    background: #e43d3d;
+    border-radius: 5px;
+    color: black;
+    font-weight: 700;
+    text-decoration: none;
+    transition: 0.5s;
+    width: 41px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    float: right;
+}
+
+header a:hover{
+    color: white;
+    width: 108px;
+}
+
+header a i{
+    padding: 5px 12px 5px 5px;
 }

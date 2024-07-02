@@ -1,36 +1,55 @@
-.game-form{
+.lobby-main-section{
+    margin-top: 25px;
+}
+
+.game-form {
     display: block;
     margin: 0 auto;
-    background-color: white;
-width: fit-content;
+    background-color: transparent;
+    width: fit-content;
+}
+
+.games-list{
+    width: fit-content;
+    margin: auto;
 }
 
 
-
-.form-join{
+.form-join {
     width: 330px;
     background-color: white;
     margin: 0 auto;
+    padding: 15px 10px;
+    cursor: pointer;
 
 }
 
-h4.form-join{
+.form-join:hover{
+    background-color: #cbdae8;
+
+}
+
+h4.form-join {
     font-style: italic;
     color: rgb(128, 128, 128);
     font-family: serif;
     text-align: center;
+
 }
 
-.game-join-button{
+
+.game-join-button {
     border: none;
     background-color: transparent;
     padding: 5px;
     width: 100%;
     text-align: start;
     position: relative;
+    cursor: pointer;
+
 }
 
-.game-join-button:before{
+.game-join-button:before {
     font-family: "Font Awesome 5 Free";
     content: "\f3c1";
     display: inline-block;
@@ -43,7 +62,7 @@ h4.form-join{
 }
 
 
-.game-join-button.closed:before{
+.game-join-button.closed:before {
     font-family: "Font Awesome 5 Free";
     content: "\f023";
     display: inline-block;
@@ -55,71 +74,63 @@ h4.form-join{
     right: 15px;
 }
 
-.game-join-button:hover {
-    background-color: #cbdae8;
+
+
+.create-game-btn {
+    background-color: #4D4AE8;
+    background-image: linear-gradient(180deg, rgba(255, 255, 255, .15), rgba(255, 255, 255, 0));
+    border: 1px solid #4D4AE8;
+    border-radius: 1rem;
+    box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset, rgba(46, 54, 80, 0.075) 0 1px 1px;
+    box-sizing: border-box;
+    color: #FFFFFF;
     cursor: pointer;
+    display: inline-block;
+    font-family: Inter, sans-serif;
+    font-size: 1rem;
+    font-weight: 500;
+    line-height: 1.5;
+    margin: 10px 0 0 0 ;
+    padding: .5rem 1rem;
+    text-align: center;
+    text-transform: none;
+    transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: manipulation;
+    vertical-align: middle;
 }
 
-
-
-
-.time{
-    width: 50px;
-    height: 50px;
+.create-game-btn:focus:not(:focus-visible),
+.create-game-btn:focus {
+    outline: 0;
 }
 
-.base-timer {
-    position: relative;
-    width: 50px;
-    height: 50px;
+.create-game-btn:hover {
+    background-color: #3733E5;
+    border-color: #3733E5;
 }
 
-.base-timer__svg {
-    transform: scaleX(-1);
+.create-game-btn:focus {
+    background-color: #413FC5;
+    border-color: #3E3BBA;
+    box-shadow: rgba(255, 255, 255, 0.15) 0 1px 0 inset, rgba(46, 54, 80, 0.075) 0 1px 1px, rgba(104, 101, 235, 0.5) 0 0 0 .2rem;
 }
 
-.base-timer__circle {
-    fill: none;
-    stroke: none;
+.create-game-btn:active {
+    background-color: #3E3BBA;
+    background-image: none;
+    border-color: #3A38AE;
+    box-shadow: rgba(46, 54, 80, 0.125) 0 3px 5px inset;
 }
 
-.base-timer__path-elapsed {
-    stroke-width: 7px;
-    stroke: grey;
+.create-game-btn:active:focus {
+    box-shadow: rgba(46, 54, 80, 0.125) 0 3px 5px inset, rgba(104, 101, 235, 0.5) 0 0 0 .2rem;
 }
 
-.base-timer__path-remaining {
-    stroke-width: 7px;
-    stroke-linecap: round;
-    transform: rotate(90deg);
-    transform-origin: center;
-    transition: 1s linear all;
-    fill-rule: nonzero;
-    stroke: currentColor;
+.create-game-btn:disabled {
+    background-image: none;
+    box-shadow: none;
+    opacity: .65;
+    pointer-events: none;
 }
-
-.base-timer__path-remaining.green {
-    color: rgb(65, 184, 131);
-}
-
-.base-timer__path-remaining.orange {
-    color: orange;
-}
-
-.base-timer__path-remaining.red {
-    color: red;
-}
-
-.base-timer__label {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    top: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    color: white;
-    font-family: sans-serif;
-}
-

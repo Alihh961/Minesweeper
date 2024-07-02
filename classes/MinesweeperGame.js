@@ -22,7 +22,6 @@ class MinesweeperGame {
     }
 
 
-
     _generateObjects() {
 
         const numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9];
@@ -57,7 +56,7 @@ class MinesweeperGame {
         return array;
     }
 
-    _getObjects(){
+    _getObjects() {
         return this.objects;
     }
 
@@ -65,7 +64,7 @@ class MinesweeperGame {
         const randomValue = this._getObjects()[index];
 
         this._getObjects()[index] = null;
-        this.removedValues.push({ value: randomValue, squareId: index });
+        this.removedValues.push({value: randomValue, squareId: index});
 
         this._updatePlayerStats(randomValue, player);
         this._updateClicksLeft(player);
@@ -74,24 +73,27 @@ class MinesweeperGame {
         return randomValue;
     }
 
-    checkPlayerClicks(player){
+    checkPlayerClicks(jwt) {
 
-        if(player === 'creator'){
-            console.log(this.creator.clicksLeft);
+
+        let player = this.getPlayerByJwt(jwt);
+
+        let playerType = player.type;
+        if (playerType === 'creator') {
 
             return this.creator.clicksLeft;
 
-        }else if(player === 'joiner'){
+        } else if (playerType === 'joiner') {
             return this.joiner.clicksLeft;
 
         }
         return false;
     }
 
-    checkPlayerLives(player){
-        if(player === 'creator'){
+    checkPlayerLives(player) {
+        if (player === 'creator') {
             return this.creator.lives;
-        }else if(player === 'joiner'){
+        } else if (player === 'joiner') {
             return this.joiner.lives;
         }
     }
@@ -115,13 +117,36 @@ class MinesweeperGame {
     }
 
     _generateUUIDv4() {
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
             const r = Math.random() * 16 | 0,
                 v = c === 'x' ? r : (r & 0x3 | 0x8);
             return v.toString(16);
         });
     };
 
+    _checkGameValidity(gameId, jwt1, jwt2) {
+        return gameId === this.id && (jwt1 === this.joiner.jwt && jwt2 === this.creator.jwt) || (jwt2 === this.joiner.jwt && jwt1 === this.creator.jwt);
+    }
+
+    // get opp will return the second player
+    getPlayerByJwt(jwt, getOpp = false) {
+        if (this.creator.jwt === jwt) {
+
+            if (getOpp) {
+                return this.joiner;
+
+            }
+            return this.creator;
+        } else if (this.joiner.jwt === jwt) {
+            if (getOpp) {
+                return this.creator;
+
+            }
+            return this.joiner;
+        } else {
+            return false;
+        }
+    }
 
 
 }

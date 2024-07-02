@@ -1,5 +1,5 @@
 class Player{
-    constructor(id , type , name) {
+    constructor(id , type , name , jwt) {
 
         this.id = id;
         this.type = type;
@@ -7,7 +7,7 @@ class Player{
         this.score = 0;
         this.lives = 2;
         this.clicksLeft = 20;
-
+        this.jwt = jwt;
     }
 
     addLife() {

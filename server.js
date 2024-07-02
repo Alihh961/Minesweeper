@@ -4,6 +4,8 @@ const userRouter = require('./routes/UserRouter');
 const cookieParser = require('cookie-parser');
 let MinesweeperGame = require('./classes/MinesweeperGame');
 
+const JWT = require('jsonwebtoken');
+
 let Player = require('./classes/Player');
 const functions = require('./public/utils/functions');
 const bcrypt = require('bcryptjs');
@@ -11,6 +13,7 @@ const bcrypt = require('bcryptjs');
 const {requireAuth, userIsAuthenticated} = require('./middleware/authMiddleware');
 const http = require('http');
 const socketIO = require('socket.io');
+const socketController = require('./controllers/socketController');
 
 const dotenv = require('dotenv').config();// it must before the declaration of app
 const mongoose = require('mongoose');
@@ -52,84 +55,102 @@ io.on('connection', (socket) => {
 
     const playerId = socket.id;
 
-    socket.on('createAGame', (creatorObject) => {
+    socket.on('createAGame', (data) => {
+
         let gameExists = false;
         games.forEach(game => {
-            if (game.creator.name === creatorObject.creator) {
+            if (game.creator.name === data.creator) {
                 gameExists = true;
                 socket.emit('errorCreatingGame', {
-                    message: 'A game exists already for ' + creatorObject.creator
+                    message: 'A game exists already for ' + data.creator
                 })
             }
         });
 
         if (!gameExists) {
             var game = new MinesweeperGame();
-            game.creator = new Player(playerId, 'creator', creatorObject.creator);
 
-            games.push(game);
-            socket.join(game.id);
-            io.to(game.id).emit('gameCreatedSuccessfully', {
-                message: 'Game created successfully',
-                game
+
+            //check if the token is related to a user then add the jwt token to the player object
+            socketController.handleJwt(data.jwt).then((results) => {
+
+                game.creator = new Player(playerId, 'creator', data.creator, data.jwt);
+                games.push(game);
+                socket.join(game.id);
+                io.to(game.id).emit('gameCreatedSuccessfully', {
+                    message: 'Game created successfully',
+                    game
+                });
+                io.emit('receivingAllGames', {
+                    games
+                });
+
+            }).catch(err => {
+                console.log(err)
             });
-            io.emit('receivingAllGames', {
-                games
-            });
+
 
         }
 
 
     });
 
-    socket.on('join', (data) => {
-
-        // room game
+    socket.on('join', async (data) => {
         const game = io.sockets.adapter.rooms.get(data.gameId);
+        let currentGame = getGameById(data.gameId);
 
         let errorMessage;
+        let jwt = data.jwt;
 
-        if (game) {
-            // object Minesweeper game
-            let currentGame = getGameById(data.gameId);
-            if (currentGame.creator.name === data.joiner) {
-                errorMessage = `You can't join your game!`;
 
-            } else {
-                if (game.size === 1 && !game.closed) {
-                    socket.join(data.gameId);
-                    currentGame.closed = true;
-                    currentGame.joiner = new Player(socket.id, 'joiner', data.joiner);
-                    io.to(currentGame.id).emit('gameJoinedSuccessfully', {
-                        game: currentGame
-                    });
+        if (game && currentGame) {
+            try {
+                const results = await socketController.handleJwt(jwt);
 
-                } else if (currentGame.closed) {
-                    errorMessage = 'The game is closed ';
-                } else {
-                    errorMessage = 'Unjoinable game ';
+                if (!results.status) {
 
+                    errorMessage = 'Unknown Error';
+                    throw new Error('Invalid JWT or authentication failed');
                 }
+
+                // Object Minesweeper game
+
+
+                if (currentGame.creator.jwt === jwt) {
+
+                    errorMessage = `You can't join your game!`;
+
+                } else {
+                    if (game.size === 1 && !game.closed) {
+                        socket.join(data.gameId);
+                        currentGame.closed = true;
+
+                        currentGame.joiner = new Player(socket.id, 'joiner', data.joiner, data.jwt);
+
+                        io.to(currentGame.id).emit('gameJoinedSuccessfully', {
+                            game: currentGame
+                        });
+
+                        io.emit('receivingAllGames' , {games});
+                    } else if (currentGame.closed) {
+                        errorMessage = 'The game is closed';
+                    } else {
+                        errorMessage = 'Unjoinable game';
+                    }
+                }
+            } catch (error) {
+                console.error({error});
             }
-
-
-        } else {
+        } else if (!game || !currentGame) {
             errorMessage = 'No Game Found';
         }
+
         if (errorMessage) {
-            socket.emit('errorJoiningAGame', {
+            io.to(playerId).emit('errorJoiningAGame', {
                 errorMessage
             });
-
         }
-
     });
-
-    socket.on('toto', (data) => {
-        io.to(data.playerId).emit('totoz', {
-            message: 'hello there'
-        });
-    })
 
     socket.on('squareClicked', async (data) => {
 
@@ -137,28 +158,24 @@ io.on('connection', (socket) => {
         let gameId = data.gameId;
         let value;
         let currentGame;
-        const hashedPlayerType = data.hashedPlayerType;
-        const clickedByJoiner = await bcrypt.compare('joiner', hashedPlayerType);
-        var clicker;
+        const jwt = data.jwt;
+        let clicker;
 
-        if (clickedByJoiner) {
-            clicker = 'joiner';
-        } else {
-            clicker = 'creator';
-        }
 
         games.forEach(game => {
             if (game.id === gameId) {
 
-                if (game.checkPlayerClicks(clicker)) {
+                if (game.checkPlayerClicks(jwt)) {
 
 
+                    clicker = game.getPlayerByJwt(jwt).type;
                     if (game.nextClicker === clicker) {
 
 
                         value = game.returnThenRemoveAnObject(squareId, clicker);
 
                         currentGame = game;
+
                         io.to(data.gameId).emit('receiveSquareContent', {
                             value,
                             squareId,
@@ -166,24 +183,23 @@ io.on('connection', (socket) => {
                         });
 
                         // check if the click ran out of lives
-                        if(!game.checkPlayerLives(clicker)){
+                        if (!game.checkPlayerLives(clicker)) {
 
-                            if(clicker === 'creator'){
+                            if (clicker === 'creator') {
 
-                                io.to(game.creator.id).emit('noMoreLivesForYou' , {
+                                io.to(game.creator.id).emit('noMoreLivesForYou', {
                                     game
                                 });
-                                io.to(game.joiner.id).emit('noMoreLivesForOpp' , {
+                                io.to(game.joiner.id).emit('noMoreLivesForOpp', {
                                     game
                                 });
 
 
-
-                            }else if(clicker === 'joiner'){
-                                io.to(game.joiner.id).emit('noMoreLivesForYou' , {
+                            } else if (clicker === 'joiner') {
+                                io.to(game.joiner.id).emit('noMoreLivesForYou', {
                                     game
                                 });
-                                io.to(game.creator.id).emit('noMoreLivesForOpp' , {
+                                io.to(game.creator.id).emit('noMoreLivesForOpp', {
                                     game
                                 });
 
@@ -191,7 +207,6 @@ io.on('connection', (socket) => {
                             }
 
                         }
-
 
                         // when the joiner runs out of clicks that mean the same for creator because they both have the same number of clicks
                         if (!game.joiner.clicksLeft) {
@@ -234,21 +249,40 @@ io.on('connection', (socket) => {
 
     socket.on('closeGame', (data) => {
 
-        closeAGame(data.gameId);
+        let currentGame = getGameById(data.gameId);
 
-        io.emit('receivingAllGames', {
-            games
-        });
+        if (data.jwt && data.refreshed && !data.noMoreLives && currentGame) {
 
 
-        if (!data.noMoreLives && data.refreshed) {
+            let jwt = data.jwt;
 
-            io.to(data.gameId).emit('gameIsClosed', {
-                message: 'You won, Your opponent left the game!',
-                player: data.player
+            let clicker = currentGame.getPlayerByJwt(jwt);
+            let opp = currentGame.getPlayerByJwt(jwt, true);
+
+            if (clicker) {
+                closeAGame(data.gameId);
+
+
+
+                io.to(opp.id).emit('gameIsClosed', {
+                    message: 'You won, Your opponent left the game!',
+                    player: data.player
+                });
+
+                io.to(clicker.id).emit('gameIsClosed', {
+                    message: 'You left the game!',
+                    player: data.player
+                });
+
+
+
+            io.emit('receivingAllGames', {
+                games
             });
+        }
 
         }
+
 
 
     })
@@ -274,7 +308,6 @@ io.on('connection', (socket) => {
 
 });
 
-
 server.listen(port, () => {
     console.log(port);
     console.log('Server connected');
@@ -284,8 +317,9 @@ server.listen(port, () => {
 app.use(userIsAuthenticated);
 app.get('/', accessToLoginSignupPage, (req, res) => {
 
-    res.render('home');
+    res.render('home', {pageTitle: 'Sign In or Create an Account'});
 });
+
 
 app.use('/user', userRouter.router);
 app.post('/game', async (req, res) => {
@@ -294,30 +328,34 @@ app.post('/game', async (req, res) => {
     const joiner = req.body.joiner ? req.body.joiner : null;
     const gameId = req.body.gameId;
 
-    const saltRounds = 10;
-    var hashedPlayerType;
+    const user = res.locals.user;
 
+    res.render('game', {creator, joiner, gameId, pageTitle: `Game`});
+});
 
-    if (joiner) {
-        let gameToJoin = games.find(game => game.id === gameId);
-        hashedPlayerType = await bcrypt.hash('joiner', saltRounds);
-        if (!gameToJoin) {
+app.post('/checkGame', (req, res) => {
 
-            return res.json({'Error': 'No game found with the provided ID'});
-        }
-    } else {
+    // token from the browser
+    let token = req.cookies.jwt;
+    let gameId = req.body.gameId;
 
-        hashedPlayerType = await bcrypt.hash('creator', saltRounds);
+    let gameToJoin = games.find(game => game.id === gameId);
 
+    if (!gameToJoin) {
+        res.redirect('lobby?err=x')
+
+    } else if (token === gameToJoin.creator.jwt) {
+        res.redirect('lobby?err=n')
     }
 
-    res.render('game', {creator, joiner, gameId, hashedPlayerType});
+    res.redirect(307, '/game');
 });
 
 
 app.use('/lobby', requireAuth, (req, res) => {
 
-    res.render('lobby');
+    res.render('lobby', {pageTitle: 'Lobby Page'});
+
 });
 
 app.get('/set-cookies', (req, res) => {

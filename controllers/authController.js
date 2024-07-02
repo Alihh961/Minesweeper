@@ -83,8 +83,8 @@ const login = async (req, res) => {
 
         const token = signToken(user._id);
 
-        // httpOnly means that the user can't access the cookie from the browser like the console
-        res.cookie('jwt', token, {httpOnly: true, maxAge: maxAge * 1000}) // * 1000 because in the cookie it is treated in milliseconds
+        // httpOnly (true) means that the user can't access the cookie from the browser like the console
+        res.cookie('jwt', token, {httpOnly: false, maxAge: maxAge * 1000}) // * 1000 because in the cookie it is treated in milliseconds
 
         // res.redirect('/lobby');
         return res.status(200).json({
@@ -111,12 +111,12 @@ const logout = (req , res)=>{
 
 
 
-const maxAge = 3 * 24 * 60 * 60;
+const maxAge = 30 * 24 * 60 * 60;
 
 const signToken = function (id) {
     return jwt.sign(
         {id} /* payload*/,
-        process.env.SECRET_STR /* secret string */,
+        process.env.APP_SECRET /* secret string */,
         {
             expiresIn: maxAge /* expire date */,
         }

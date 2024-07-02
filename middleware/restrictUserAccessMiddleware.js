@@ -7,7 +7,8 @@ const accessToLoginSignupPage = (req, res ,next) => {
 
     if(token){
 
-        jwt.verify(token ,process.env.SECRET_STR , (err, decodedToken)=>{
+        jwt.verify(token ,process.env.APP_SECRET , (err, decodedToken)=>{
+            console.log(err);
             if(!err){
                 res.redirect('/lobby');
             }else{
