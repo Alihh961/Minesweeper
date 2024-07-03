@@ -7,7 +7,6 @@ const requireAuth = (req, res, next) => {
 
     if (token) {
 
-        console.log(process.env.APP_SECRET);
         jwt.verify(token, process.env.APP_SECRET, (err, decodedToken) => {
 
             if (err) {

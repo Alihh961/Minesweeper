@@ -13,15 +13,18 @@
     </div>
 
     <form class='game-form' action="/game" method="POST">
-        <input type="hidden" value="<%= user.userName %>" name="creator">
+        <% if(user && user.userName){ %>
+
+            <input type="hidden" value="<%= user.userName %>" name="creator">
+        <%  } %>
+
         <button Type="submit" onclick="" class="create-game-btn">Create a game</button>
 
     </form>
 
 </section>
 
-
-
+<%- include('./partials/footer.ejs') %>
 
 <script src="script/lobby.js" defer></script>
 

@@ -2,7 +2,7 @@ const express = require('express');
 const path = require('path');
 const userRouter = require('./routes/UserRouter');
 const cookieParser = require('cookie-parser');
-const { userIsAuthenticated} = require('./middleware/authMiddleware');
+const { userIsAuthenticated, requireAuth} = require('./middleware/authMiddleware');
 const http = require('http');
 const socketIO = require('socket.io');
 const socketController = require('./controllers/socketController');
@@ -58,7 +58,7 @@ app.get('/', accessToLoginSignupPage, (req, res) => {
 
 
 app.use('/user', userRouter.router);
-app.post('/game', async (req, res) => {
+app.post('/game', requireAuth,  async (req, res) => {
 
     const creator = req.body.creator ? req.body.creator : null;
     const joiner = req.body.joiner ? req.body.joiner : null;
@@ -88,7 +88,7 @@ app.post('/checkGame', (req, res) => {
 });
 
 
-app.use('/lobby', (req, res) => {
+app.get('/lobby' , requireAuth, (req, res) => {
     res.render('lobby', {pageTitle: 'Lobby Page'});
 
 });
@@ -102,6 +102,10 @@ app.get('/get-cookies', (req, res) => {
     const cookies = req.cookies;
 
     res.json(cookies);
+});
+
+app.use((req,res,next)=>{
+    res.status(404).render('404' , {pageTitle : 'Page Not Found'})
 })
 
 
