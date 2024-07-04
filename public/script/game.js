@@ -15,7 +15,7 @@ if (creator) {
         creator: creator,
         jwt: getCookie('jwt')
     });
-    document.body.style.pointerEvents = 'none';
+    // document.body.style.pointerEvents = 'none';
     document.body.classList.add('game-not-started');
 } else if (joiner) {
     socket.emit('join', {joiner: loggedUser, gameId: gameId, jwt: getCookie('jwt')});
@@ -40,7 +40,7 @@ socket.on('gameCreatedSuccessfully', function (data) {
 // starting the game
 socket.on('gameJoinedSuccessfully', function (data) {
 
-    document.body.style.pointerEvents = 'auto';
+    // document.body.style.pointerEvents = 'auto';
     document.body.classList.remove('game-not-started');
     document.querySelector('.msg-game-not-started').remove();
 
@@ -50,6 +50,7 @@ socket.on('gameJoinedSuccessfully', function (data) {
     const msgCreatorClickFirst = document.querySelector('.game-main-section .msg-creator-start-first');
 
     msgCreatorClickFirst.classList.add('fadeOut');
+    msgCreatorClickFirst.remove();
 
 
     const squaresContainer = document.querySelector('.mines-container');
