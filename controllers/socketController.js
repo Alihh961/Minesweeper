@@ -273,6 +273,10 @@ function socketServer(io, games) {
 
         })
 
+        socket.on('fired' , (data)=>{
+            console.log(data.gameId);
+        })
+
         function closeAGame(id) {
 
             const index = games.findIndex(game => game.id === id);

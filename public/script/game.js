@@ -149,7 +149,6 @@ socket.on('receiveSquareContent', function (data) {
 
     if (clickedSquare && !clickedSquare.classList.contains('opened')) {
 
-
         if (typeof (value) === "number") {
             clickedSquare.innerHTML = data.value;
             clickedSquare.classList.add('opened');
@@ -255,6 +254,17 @@ window.addEventListener('beforeunload', () => {
 
 });
 
+window.addEventListener('pagehide', () => {
+    if (window.gameId) {
+        socket.emit('closeGame', {
+            gameId: window.gameId,
+            message: 'close the game of id ' + window.gameId,
+            jwt: getCookie('jwt'),
+            refreshed: true
+        });
+    }
+
+});
 
 if (gameId) {
     socket.emit('getGameById', {
