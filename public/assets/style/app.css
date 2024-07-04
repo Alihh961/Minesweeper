@@ -46,26 +46,23 @@ body.game-not-started:before {
 .user-username:before{
     content: "";
     position: absolute;
-    left: -5.8%;
-    top: 5.3px;
-    rotate: 45deg;
+    left: -8.7%;
+    top: 0;
     width: 0;
     height: 0;
-    border-left: 0 solid transparent;
-    border-right: 26.5px solid transparent;
-    border-bottom: 26.5px solid #00a158;
-
+    border-top: 17.7px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-right: 20px solid #00a158;
 }
 
 .user-username:after{
     content: "";
     position: absolute;
-    right: -5.8%;
-    top: 5.3px;
-    rotate: 225deg;
+    right: -8.7%;
+    top: 0;
     width: 0;
     height: 0;
-    border-left: 0px solid transparent;
-    border-right: 26.5px solid transparent;
-    border-bottom: 26.5px solid #00a158;
+    border-top: 17.7px solid transparent;
+    border-bottom: 20px solid transparent;
+    border-left: 20px solid #00a158;
 }
