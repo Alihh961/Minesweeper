@@ -4,7 +4,6 @@ let socket = io();
 document.body.style.overflow = 'hidden';
 
 
-
 const creator = document.querySelector("input[name='creator']").value;
 const joiner = document.querySelector("input[name='joiner']").value;
 const gameId = document.querySelector("input[name='gameId']").value;
@@ -14,12 +13,12 @@ const loggedUser = document.querySelector("input[name='loggedUser']").value;
 if (creator) {
     socket.emit('createAGame', {
         creator: creator,
-        jwt : getCookie('jwt')
+        jwt: getCookie('jwt')
     });
     document.body.style.pointerEvents = 'none';
     document.body.classList.add('game-not-started');
 } else if (joiner) {
-    socket.emit('join', {joiner: loggedUser, gameId: gameId , jwt : getCookie('jwt')});
+    socket.emit('join', {joiner: loggedUser, gameId: gameId, jwt: getCookie('jwt')});
 } else {
     window.location.href = '/lobby';
 }
@@ -64,7 +63,7 @@ socket.on('gameJoinedSuccessfully', function (data) {
     }
 
     socket.emit('askingForPlayersInfoToUpdateOnScreen', {
-        gameId : window.gameId
+        gameId: window.gameId
     })
 
 
@@ -72,43 +71,47 @@ socket.on('gameJoinedSuccessfully', function (data) {
     if (squares) {
         squares.forEach((square) => {
             square.addEventListener('click', (event) => {
+                handleClickEvent();
+            });
+
+            square.addEventListener('touchstart', (event) => {
+                handleClickEvent();
+            });
+
+            function handleClickEvent(){
                 let clickedSquare = event.target;
                 let squareId = clickedSquare.getAttribute('data-square');
 
 
                 document.querySelector('.msg-creator-start-first').style.display = 'none';
 
-                    // Emit the squareClicked event to the server
-                    socket.emit('squareClicked', {
-                        message: 'A square was clicked!',
-                        squareId,
-                        gameId: window.gameId,
-                        jwt : getCookie('jwt')
+                // Emit the squareClicked event to the server
+                socket.emit('squareClicked', {
+                    message: 'A square was clicked!',
+                    squareId,
+                    gameId: window.gameId,
+                    jwt: getCookie('jwt')
 
-                    });
-
-
-
+                });
+            }
 
 
-            });
         });
     }
-
 
 
 });
 
 
-socket.on('toggleTurnOnScreen' , function(data){
+socket.on('toggleTurnOnScreen', function (data) {
 
     const containers = document.querySelectorAll('.players-info-container');
 
-    if(data.turn === 'mine'){
+    if (data.turn === 'mine') {
         containers[1].classList.add('his-turn');
         containers[0].classList.remove('his-turn');
 
-    }else if(data.turn === 'his'){
+    } else if (data.turn === 'his') {
 
         containers[0].classList.add('his-turn');
         containers[1].classList.remove('his-turn');
@@ -116,7 +119,7 @@ socket.on('toggleTurnOnScreen' , function(data){
     }
 })
 
-socket.on('errorCreatingGame', function(error){
+socket.on('errorCreatingGame', function (error) {
     Swal.fire({
         icon: "error",
         text: "A game already running for " + loggedUser,
@@ -125,11 +128,11 @@ socket.on('errorCreatingGame', function(error){
     });
 })
 
-socket.on('notYourClick' , function(data){
+socket.on('notYourClick', function (data) {
     Swal.fire({
-        icon : "error" ,
-        title : "Wait" ,
-        text : "It is not your turn yet!"
+        icon: "error",
+        title: "Wait",
+        text: "It is not your turn yet!"
     })
 });
 
@@ -164,24 +167,24 @@ socket.on('receiveSquareContent', function (data) {
         }
 
         // adding red color for squares click by opp
-        if(data.cssClass){
+        if (data.cssClass) {
             clickedSquare.classList.add(data.cssClass);
         }
 
-        socket.emit('askingForPlayersInfoToUpdateOnScreen' , {
-            gameId : window.gameId
+        socket.emit('askingForPlayersInfoToUpdateOnScreen', {
+            gameId: window.gameId
         })
 
-    }else{
-        socket.emit('closeGame' , {
-            gameId : window.gameId
+    } else {
+        socket.emit('closeGame', {
+            gameId: window.gameId
         });
 
         Swal.fire({
-            icon :"error" ,
-            title : 'Error',
-            text : 'Something went wrong!'
-        }).then(function (){
+            icon: "error",
+            title: 'Error',
+            text: 'Something went wrong!'
+        }).then(function () {
             window.location.href = '/lobby';
         })
 
@@ -189,13 +192,13 @@ socket.on('receiveSquareContent', function (data) {
 });
 
 // when there is no clicks this event will be executed 2 seconds after the last click
-socket.on('noClicksLeft' , function (data){
+socket.on('noClicksLeft', function (data) {
 
     onNoMoreClickLeft(data.message);
 
 });
 
-socket.on('noMoreLivesForOpp' , function(data){
+socket.on('noMoreLivesForOpp', function (data) {
 
     Swal.fire({
         title: 'Congratulations!',
@@ -204,19 +207,19 @@ socket.on('noMoreLivesForOpp' , function(data){
         showConfirmButton: false
     });
 
-    socket.emit('closeGame' , {
-        gameId : data.gameId
+    socket.emit('closeGame', {
+        gameId: data.gameId
     })
 
-    setTimeout(function(){
-        window.location.href ='lobby';
+    setTimeout(function () {
+        window.location.href = 'lobby';
 
-    },2500);
+    }, 2500);
 
 
 });
 
-socket.on('noMoreLivesForYou' , function(data){
+socket.on('noMoreLivesForYou', function (data) {
 
     Swal.fire({
         title: 'Sorry, out of lives',
@@ -225,14 +228,14 @@ socket.on('noMoreLivesForYou' , function(data){
         showConfirmButton: false
     });
 
-    socket.emit('closeGame' , {
-        gameId : data.gameId
+    socket.emit('closeGame', {
+        gameId: data.gameId
     })
 
-    setTimeout(function(){
-        window.location.href ='lobby';
+    setTimeout(function () {
+        window.location.href = 'lobby';
 
-    },2500);
+    }, 2500);
 })
 
 window.addEventListener('beforeunload', () => {
@@ -240,7 +243,7 @@ window.addEventListener('beforeunload', () => {
         socket.emit('closeGame', {
             gameId: window.gameId,
             message: 'close the game of id ' + window.gameId,
-            jwt : getCookie('jwt'),
+            jwt: getCookie('jwt'),
             refreshed: true
         });
     }
@@ -262,48 +265,46 @@ socket.on('setGameById', (data) => {
 // show won message when the opponent leaves the game
 socket.on('gameIsClosed', function (data) {
 
-        Swal.fire({
-            title: data.message,
-            confirmButtonText: "Back to lobby",
-            showClass: {
-                popup: `
+    Swal.fire({
+        title: data.message,
+        confirmButtonText: "Back to lobby",
+        showClass: {
+            popup: `
       animate__animated
       animate__fadeInUp
       animate__faster
     `
-            },
-            hideClass: {
-                popup: `
+        },
+        hideClass: {
+            popup: `
       animate__animated
       animate__fadeOutDown
       animate__faster
     `
-            }
-        }).then(function () {
-            window.location.href = '/lobby';
-        });
+        }
+    }).then(function () {
+        window.location.href = '/lobby';
+    });
 
 
 });
 
-socket.on('ranOfClicks' , function(data){
+socket.on('ranOfClicks', function (data) {
     Swal.fire({
-        icon : 'info' ,
-        title : 'Game Ended',
-        text : 'Game ended for running out of clicks'
+        icon: 'info',
+        title: 'Game Ended',
+        text: 'Game ended for running out of clicks'
     })
 })
 
-socket.on('updatePlayersInfoOnScreen' , function(data){
+socket.on('updatePlayersInfoOnScreen', function (data) {
 
-    if(data.yourInfo && data.oppInfo){
+    if (data.yourInfo && data.oppInfo) {
         updatePlayersInfoOnScreen(data);
     }
 
 
 });
-
-
 
 
 function updatePlayersInfoOnScreen(info) {
@@ -321,25 +322,25 @@ function updatePlayersInfoOnScreen(info) {
 
 }
 
-function onNoMoreClickLeft(message){
+function onNoMoreClickLeft(message) {
 
-        Swal.fire({
-            icon : message.icon ,
-            title: message.title,
-            html : message.html,
-            showConfirmButton: false
-        })
+    Swal.fire({
+        icon: message.icon,
+        title: message.title,
+        html: message.html,
+        showConfirmButton: false
+    })
 
-    setTimeout(function(){
-        window.location.href='lobby';
-    } , 3000)
+    setTimeout(function () {
+        window.location.href = 'lobby';
+    }, 3000)
 
 
 }
 
 function getCookie(name) {
     let cookie = {};
-    document.cookie.split(';').forEach(function(el) {
+    document.cookie.split(';').forEach(function (el) {
         let split = el.split('=');
         cookie[split[0].trim()] = split.slice(1).join("=");
     })
