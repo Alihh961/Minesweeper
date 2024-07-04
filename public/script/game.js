@@ -39,6 +39,7 @@ socket.on('gameCreatedSuccessfully', function (data) {
 
 // starting the game
 socket.on('gameJoinedSuccessfully', function (data) {
+
     document.body.style.pointerEvents = 'auto';
     document.body.classList.remove('game-not-started');
     document.querySelector('.msg-game-not-started').remove();
@@ -54,7 +55,7 @@ socket.on('gameJoinedSuccessfully', function (data) {
     const squaresContainer = document.querySelector('.mines-container');
 
     for (let i = 0; i < 100; i++) {
-        var span = document.createElement('span');
+        var span = document.createElement('button');
 
         span.classList.add('square');
         span.setAttribute('data-square', `${i}`);

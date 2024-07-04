@@ -147,7 +147,7 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     grid-auto-rows: max-content;
 }
 
-.game-main-section .mines-container span.square {
+.game-main-section .mines-container button.square {
     display: block;
     position: relative;
     width: 25px;
@@ -162,28 +162,28 @@ body.game-not-started div.msg-game-not-started .loading-dots span:nth-child(2) {
     font-size: 20px;
 }
 
-.game-main-section .mines-container span.square.heart {
+.game-main-section .mines-container button.square.heart {
     color: green;
 }
 
-.game-main-section .mines-container span.square.mine {
+.game-main-section .mines-container button.square.mine {
     color: red;
 }
 
-.game-main-section .mines-container span.square:active {
+.game-main-section .mines-container button.square:active {
     background: #bdbdbd;
     border: solid #999;
     border-width: 2px 0 0 2px;
 }
 
-.game-main-section .mines-container span.square.opened {
+.game-main-section .mines-container button.square.opened {
     background: linear-gradient(5deg, #8ab38a, #2dd53c);
     border: solid #222222;
     border-width: 0 1px 1px 0;
     pointer-events: none;
 }
 
-.game-main-section .mines-container span.square.opened.byOpp {
+.game-main-section .mines-container button.square.opened.byOpp {
     background: linear-gradient(5deg, #d79191, #da5b5b)!important;
 }
 
