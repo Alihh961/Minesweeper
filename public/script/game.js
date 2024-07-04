@@ -50,7 +50,9 @@ socket.on('gameJoinedSuccessfully', function (data) {
     const msgCreatorClickFirst = document.querySelector('.game-main-section .msg-creator-start-first');
 
     msgCreatorClickFirst.classList.add('fadeOut');
-    msgCreatorClickFirst.remove();
+    setTimeout(function(){
+        msgCreatorClickFirst.remove()
+    },5000);
 
 
     const squaresContainer = document.querySelector('.mines-container');
@@ -85,7 +87,6 @@ socket.on('gameJoinedSuccessfully', function (data) {
                 let squareId = clickedSquare.getAttribute('data-square');
 
 
-                document.querySelector('.msg-creator-start-first').style.display = 'none';
 
                 // Emit the squareClicked event to the server
                 socket.emit('squareClicked', {
