@@ -41,6 +41,7 @@ socket.on('gameCreatedSuccessfully', function (data) {
 socket.on('gameJoinedSuccessfully', function (data) {
 
     // document.body.style.pointerEvents = 'auto';
+    document.querySelector('.game-main-section').style.display = 'flex';
     document.body.classList.remove('game-not-started');
     if(document.querySelector('.msg-game-not-started')){
         document.querySelector('.msg-game-not-started').remove();
