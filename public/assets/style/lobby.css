@@ -32,7 +32,7 @@
 h4.form-join {
     font-style: italic;
     color: rgb(128, 128, 128);
-    font-family: serif;
+    font-family: monospace;
     text-align: center;
 
 }
@@ -46,6 +46,7 @@ h4.form-join {
     text-align: start;
     position: relative;
     cursor: pointer;
+    color: black;
 
 }
 
@@ -86,7 +87,7 @@ h4.form-join {
     color: #FFFFFF;
     cursor: pointer;
     display: inline-block;
-    font-family: Inter, sans-serif;
+    font-family: monospace;
     font-size: 1rem;
     font-weight: 500;
     line-height: 1.5;
