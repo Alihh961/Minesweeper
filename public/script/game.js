@@ -42,7 +42,10 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
     // document.body.style.pointerEvents = 'auto';
     document.body.classList.remove('game-not-started');
-    document.querySelector('.msg-game-not-started').remove();
+    if(document.querySelector('.msg-game-not-started')){
+        document.querySelector('.msg-game-not-started').remove();
+
+    }
 
 
     window.gameId = data.gameId;
@@ -51,7 +54,10 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
     msgCreatorClickFirst.classList.add('fadeOut');
     setTimeout(function(){
-        msgCreatorClickFirst.remove()
+        if(msgCreatorClickFirst){
+            msgCreatorClickFirst.remove();
+
+        }
     },5000);
 
 
@@ -75,10 +81,6 @@ socket.on('gameJoinedSuccessfully', function (data) {
     if (squares) {
         squares.forEach((square) => {
             square.addEventListener('click', (event) => {
-                handleClickEvent();
-            });
-
-            square.addEventListener('touchstart', (event) => {
                 handleClickEvent();
             });
 
