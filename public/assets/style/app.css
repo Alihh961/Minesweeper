@@ -4,23 +4,22 @@
 @import "lobby.css";
 @import "404.css";
 
-*{
+* {
     padding: 0;
     margin: 0;
     box-sizing: border-box;
     font-family: sans-serif;
 }
 
-body{
-    overflow-x:hidden ;
+body {
+    overflow-x: hidden;
     background-image: url('../images/home-bg.jpg');
     background-size: cover;
     background-repeat: no-repeat;
 }
 
 
-
-body.game-not-started:before{
+body.game-not-started:before {
     content: '';
     position: absolute;
     width: 100%;
@@ -32,4 +31,41 @@ body.game-not-started:before{
     background-color: rgba(0, 0, 0, 0.5);
 
 
+}
+
+
+.user-username {
+    margin: auto;
+    width: fit-content;
+    text-align: center;
+    padding: 5px;
+    background: #00a158;
+    position: relative;
+}
+
+.user-username:before{
+    content: "";
+    position: absolute;
+    left: -5.8%;
+    top: 5.3px;
+    rotate: 45deg;
+    width: 0;
+    height: 0;
+    border-left: 0 solid transparent;
+    border-right: 26.5px solid transparent;
+    border-bottom: 26.5px solid #00a158;
+
+}
+
+.user-username:after{
+    content: "";
+    position: absolute;
+    right: -5.8%;
+    top: 5.3px;
+    rotate: 225deg;
+    width: 0;
+    height: 0;
+    border-left: 0px solid transparent;
+    border-right: 26.5px solid transparent;
+    border-bottom: 26.5px solid #00a158;
 }

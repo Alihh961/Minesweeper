@@ -7,7 +7,7 @@
 <%- include('./partials/header.ejs') %>
 <% if(user && user.userName){ %>
 
-    <h2 style="margin: auto;width: fit-content;text-align: center; padding: 5px;background: #00a158;border-radius: 5px">Logged in as : <%= user.userName.charAt(0).toUpperCase() + user.userName.slice(1)%></h2>
+    <h2 class="user-username">Logged in as : <%= user.userName.charAt(0).toUpperCase() + user.userName.slice(1)%></h2>
 
 <%  } %>
 
