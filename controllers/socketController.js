@@ -18,7 +18,7 @@ const handleJwt = async (jwtToken) => {
 }
 
 
-function socketServer(io, games) {
+function socketServer(io, games , guestUsers) {
 
     io.on('connection', (socket) => {
 

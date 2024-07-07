@@ -10,11 +10,9 @@ const dotenv = require('dotenv').config();// it must before the declaration of a
 
 const connectToDB = require('./DBConnection');
 
-
 const app = express();
 let server = http.createServer(app);
 let io = socketIO(server);
-
 
 const port = process.env.PORT || 3000;
 const publicPath = path.join(__dirname, './public');
@@ -39,20 +37,24 @@ connectToDB().then(() => {
         process.exit(1);
     });
 
-
 let games = [];
+let user = {id : 2 , toto : "heha"};
 
-socketController.socketServer(io ,games);
+let guestUsers = new Map();
+
+guestUsers.set('user' , user);
+
+
+socketController.socketServer(io ,games , guestUsers);
 
 server.listen(port, () => {
-    console.log(port);
+    console.log(`Port: ${port}`);
     console.log('Server connected');
 })
 
 // inject the middleware for all request , the middleware will check if the token is valid then pass the user
 app.use(userIsAuthenticated);
 app.get('/', accessToLoginSignupPage, (req, res) => {
-
     res.render('home', {pageTitle: 'Sign In or Create an Account'});
 });
 
@@ -109,4 +111,4 @@ app.use((req,res,next)=>{
 })
 
 
-module.exports = server;
+module.exports = {server , guestUsers};

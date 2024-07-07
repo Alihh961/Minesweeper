@@ -1,8 +1,9 @@
 const express = require('express');
 const jwt = require("jsonwebtoken");
-
+const { v4: uuidv4 } = require('uuid')
 const userModel = require('../models/UserModel');
 
+const maxAge = 30 * 24 * 60 * 60;
 
 const signup = async (req, res, next) => {
 
@@ -82,7 +83,7 @@ const login = async (req, res) => {
         // to deselect the password
         user = await userModel.findOne({email});
 
-        const token = signToken(user._id);
+        const token = signToken(user._id , user.userName);
 
         // httpOnly (true) means that the user can't access the cookie from the browser like the console
         res.cookie('jwt', token, {httpOnly: false, maxAge: maxAge * 1000}) // * 1000 because in the cookie it is treated in milliseconds
@@ -90,9 +91,9 @@ const login = async (req, res) => {
         // res.redirect('/lobby');
         return res.status(200).json({
             status: 'success',
-            statusCode : 200 ,
-            userId : user._id ,
-            userName : user.userName
+            statusCode: 200,
+            userId: user._id,
+            userName: user.userName
         });
 
 
@@ -105,18 +106,50 @@ const login = async (req, res) => {
 
 };
 
-const logout = (req , res)=>{
-    res.cookie('jwt' , '' , {maxAge : 1});
+
+const logout = (req, res) => {
+    res.cookie('jwt', '', {maxAge: 1});
+    res.cookie('jwtG', '', {maxAge: 1});
+
     res.redirect('/');
 };
 
+const createRandomGuest = async (req, res, next) => {
 
 
-const maxAge = 30 * 24 * 60 * 60;
+    try{
+        let userName = '';
+        let id = uuidv4();
 
-const signToken = function (id) {
+
+        userName = generateRandomUserName();
+
+
+        const jwt = signToken(id , userName);
+
+        const user = {id, userName , jwt};
+
+        // httpOnly (true) means that the user can't access the cookie from the browser like the console
+        res.cookie('jwtG', jwt, {httpOnly: false, maxAge: maxAge * 1000});
+        res.locals.user = user;
+
+        return res.status(200).json({
+            status: 'success',
+            statusCode: 200,
+            userId: user.id,
+            userName: user.userName
+        });
+    }
+    catch(err){
+        console.log({Error : err});
+    }
+
+
+}
+
+const signToken = function (id , userName) {
     return jwt.sign(
-        {id} /* payload*/,
+        {id , userName} /* payload*/,
         process.env.APP_SECRET /* secret string */,
         {
             expiresIn: maxAge /* expire date */,
@@ -124,4 +157,20 @@ const signToken = function (id) {
     );
 };
 
-module.exports = {signup, login , logout};
+function generateRandomUserName() {
+    const chars = 'abcdefghijklmnopqrstuvwxyz1234567890';
+    let userName = '';
+
+
+    for (let i = 0; i < 5; i++) {
+        userName += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    userName = `Guest-${userName}`;
+
+    return userName;
+}
+
+
+
+module.exports = {signup, login, logout, createRandomGuest};

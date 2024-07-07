@@ -34,7 +34,6 @@ form[name='create-form'] {
     display: flex;
     flex-direction: column;
     gap: 10px;
-
 }
 
 .home-main-section .form-box .box-inner {
@@ -81,7 +80,7 @@ form[name='create-form'] {
 /*    cursor: pointer;*/
 /*}*/
 
-.go-button , .login-button {
+.go-button , .login-button , .guest-button{
     align-items: center;
     appearance: none;
     background-color: #6ce382;
@@ -369,11 +368,17 @@ form[name='login-form'] {
     padding: 16px;
 }
 
+form button{
+    font-family: monospace!important;
+}
+
 form[name='login-form'] > div {
     margin-bottom: 15px;
 }
+form[name='guest-form'] {
+    padding: 16px;
+}
 
-.toto{
-    position: absolute;
-    z-index: 99;
+form[name='guest-form'] button {
+    background: linear-gradient(45deg, #5272b9, #7097ec);
 }

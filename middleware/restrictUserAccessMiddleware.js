@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 
 const accessToLoginSignupPage = (req, res ,next) => {
 
-    const token = req.cookies.jwt;
+    const token = req.cookies.jwt || req.cookies.jwtG;
 
     if(token){
 
@@ -14,6 +14,8 @@ const accessToLoginSignupPage = (req, res ,next) => {
             }else{
                 console.log('err in accessToLoginSignupPage Middleware');
                 res.cookie('jwt', '1' , {maxAge : 1});
+                res.cookie('jwtG', '1' , {maxAge : 1});
+
                 next();
 
             }

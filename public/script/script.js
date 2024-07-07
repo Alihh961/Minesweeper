@@ -149,7 +149,7 @@ if (pageTitle === 'Minesweeper-Home') {
     const loginBtn = document.querySelector('.login-button');
 
     //login button
-    loginBtn.addEventListener('click', (event) => {
+    loginBtn.addEventListener('click', function (event)  {
 
         event.preventDefault();
 
@@ -210,6 +210,66 @@ if (pageTitle === 'Minesweeper-Home') {
             })
 
     });
+
+
+    // guest form button
+    const guestBtn = document.querySelector('.guest-button');
+
+    guestBtn.addEventListener('click' , function (event){
+
+        event.preventDefault();
+
+        const url = 'user/guest-login';
+
+        fetch(url , {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        })
+            .then((response)=>{
+                if(!response.ok){
+                    console.log(error);
+                }
+
+                return response.json();
+            })
+            .then(data=>{
+
+
+                if(data.statusCode  === 401 || data.statusCode === 400){
+                    Swal.fire({
+                        icon : "error" ,
+                        title : data.message,
+                    })
+                }else if(data.statusCode === 200) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Welcome',
+                        text: `${data.userName}, ready to go?`,
+                        showConfirmButton: true,
+
+                    }).then(
+                        (result) => {
+                            result.isConfirmed ? window.location.href = '/lobby' : null;
+                        }
+                    )
+
+
+                }else{
+                    Swal.fire({
+                        icon :'error',
+                        title : 'Unknown Error',
+                        text : 'Try again later'
+                    });
+                }
+
+            })
+            .catch(error=>{
+                console.log(error);
+            })
+    })
+
 
 
 }

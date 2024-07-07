@@ -13,14 +13,6 @@ class MinesweeperGame {
         this.closed = false;
     }
 
-    addCreator(id) {
-        this.creator = new Player(id, 'creator');
-    }
-
-    addJoiner(id) {
-        this.joiner = new Player(id, 'joiner');
-    }
-
 
     _generateObjects() {
 
@@ -83,17 +75,17 @@ class MinesweeperGame {
 
             return this.creator.clicksLeft;
 
-        } else if (playerType === 'joiner') {
+        } else if (playerType === 'joiner' || playerType === 'bot') {
             return this.joiner.clicksLeft;
 
         }
         return false;
     }
 
-    checkPlayerLives(player) {
-        if (player === 'creator') {
+    checkPlayerLives(playerType) {
+        if (playerType === 'creator') {
             return this.creator.lives;
-        } else if (player === 'joiner') {
+        } else if (playerType === 'joiner' || playerType === 'bot') {
             return this.joiner.lives;
         }
     }
@@ -128,13 +120,12 @@ class MinesweeperGame {
         return gameId === this.id && (jwt1 === this.joiner.jwt && jwt2 === this.creator.jwt) || (jwt2 === this.joiner.jwt && jwt1 === this.creator.jwt);
     }
 
-    // get opp will return the second player
+    // getOpp = true  will return the second player
     getPlayerByJwt(jwt, getOpp = false) {
         if (this.creator.jwt === jwt) {
 
             if (getOpp) {
                 return this.joiner;
-
             }
             return this.creator;
         } else if (this.joiner.jwt === jwt) {

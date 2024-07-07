@@ -3,14 +3,13 @@ const userModel = require('../models/UserModel');
 
 const requireAuth = (req, res, next) => {
 
-    const token = req.cookies.jwt;
-
+    const token = req.cookies.jwt || req.cookies.jwtG;
     if (token) {
 
         jwt.verify(token, process.env.APP_SECRET, (err, decodedToken) => {
 
             if (err) {
-                console.log(err.message);
+
                 res.redirect('/');
 
             } else {
@@ -30,33 +29,66 @@ const userIsAuthenticated = (req, res, next) => {
 
     const token = req.cookies.jwt;
 
-    if (token) {
+    // Guest token
+    const tokenGuest = req.cookies.jwtG;
 
-        jwt.verify(token, process.env.APP_SECRET, async (err, decodedToken) => {
-            if (err) {
 
-                console.log('Error in userIsAuthenticated Middleware')
-                res.locals.user = null;
+    if (token || tokenGuest) {
+
+        if (token) {
+            jwt.verify(token, process.env.APP_SECRET, async (err, decodedToken) => {
+                if (err) {
+
+                    console.log('Error in userIsAuthenticated Middleware');
+                    res.cookie('jwt', '1' , {maxAge : 1});
+                    res.cookie('jwtG', '1' , {maxAge : 1});
+                    res.locals.user = null;
+
+                    next();
+                } else {
+
+                    try {
+                        const user = await userModel.findById(decodedToken.id);
+                        if (!user) {
+                            throw new Error('User not found');
+                        }
+                        // Pass/inject the user to the view or further middleware
+                        res.locals.user = user;
+                        next();
+                    } catch (error) {
+                        console.log('Error fetching user:', error);
+                        res.locals.user = null;
+                        next();
+                    }
+
+                }
+            })
+        } else {
+
+            jwt.verify(tokenGuest, process.env.APP_SECRET, async (err, decodedToken) => {
+                if (err) {
+
+                    console.log('Error in userIsAuthenticated Middleware (Token Guest)')
+                    res.locals.user = null;
+                    res.cookie('jwt', '1' , {maxAge : 1});
+                    res.cookie('jwtG', '1' , {maxAge : 1});
+
+                    next();
+                } else {
+
+                const user = {id :decodedToken.id , userName :decodedToken.userName};
+
+                res.locals.user = user;
 
                 next();
-            } else {
 
-                try {
-                    const user = await userModel.findById(decodedToken.id);
-                    if (!user) {
-                        throw new Error('User not found');
-                    }
-                    // Pass/inject the user to the view or further middleware
-                    res.locals.user = user;
-                    next();
-                } catch (error) {
-                    console.log('Error fetching user:', error);
-                    res.locals.user = null;
-                    next();
+
                 }
+            })
 
-            }
-        })
+        }
+
+
     } else {
 
         res.locals.user = null;
@@ -65,7 +97,4 @@ const userIsAuthenticated = (req, res, next) => {
 };
 
 
-
-
-
-module.exports = {requireAuth , userIsAuthenticated};
+module.exports = {requireAuth, userIsAuthenticated};

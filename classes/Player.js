@@ -5,8 +5,8 @@ class Player{
         this.type = type;
         this.name = name;
         this.score = 0;
-        this.lives = 20;
-        this.clicksLeft = 3;
+        this.lives = 5;
+        this.clicksLeft = 15;
         this.jwt = jwt;
     }
 
