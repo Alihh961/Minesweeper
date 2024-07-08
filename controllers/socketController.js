@@ -125,7 +125,7 @@ function socketServer(io, games, guestUsers) {
                             updatePlayersInfoOnScreen(currentGame);
 
 
-                            io.emit('receivingAllGames', {games});
+                            io.emit('fetchingAllGames', {games});
                         } else if (currentGame.closed) {
                             errorMessage = 'The game is closed';
                         } else {
@@ -344,7 +344,7 @@ function socketServer(io, games, guestUsers) {
         });
 
         socket.on('getAllGames', () => {
-            socket.emit('receivingAllGames', {
+            socket.emit('fetchingAllGames', {
                 games
             })
         });
@@ -387,7 +387,7 @@ function socketServer(io, games, guestUsers) {
                             player: data.player
                         });
                     }
-                    io.emit('receivingAllGames', {
+                    io.emit('fetchingAllGames', {
                         games
                     });
                 }
@@ -449,7 +449,6 @@ function socketServer(io, games, guestUsers) {
                 score: game.creator.score,
                 clicksLeft: game.creator.clicksLeft
             };
-            console.log(game);
             const joinerInfo = {
                 lives: game.joiner.lives,
                 score: game.joiner.score,

@@ -32,22 +32,19 @@ body.game-not-started:before {
 
 }
 
-
-.user-username {
+.user-username-span{
     margin: auto;
+    display: block;
     width: fit-content;
+    font-weight: 900;
     text-align: center;
-    padding: 5px;
-    position: relative;
-    background: linear-gradient(135deg, #fa7d60, #eb5936);
+    font-size: x-large;
+    background: linear-gradient(135deg, #e9ff00, #e9ff00);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     text-fill-color: transparent;
-
 }
-
-
 
 /*.user-username:before{*/
 /*    content: "";*/
