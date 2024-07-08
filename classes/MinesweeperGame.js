@@ -2,6 +2,9 @@ class MinesweeperGame {
 
 
     constructor() {
+
+        this.name = null;
+
         this.objects = this._generateObjects();
         this.removedValues = [];
 

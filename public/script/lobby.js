@@ -44,10 +44,7 @@ socket.on('disconnect', () => {
     console.log('disconnected from the server');
 });
 
-socket.emit('getAllGames', {
-
-    }
-);
+socket.emit('getAllGames');
 
 socket.on('receivingAllGames', (data) => {
 
@@ -90,7 +87,7 @@ function updateGamesList(games, gamesListContainer) {
 
             const button = document.createElement('button');
             button.setAttribute('type', 'submit');
-            button.innerText = `${game.creator.name}'s game`;
+            button.innerText = `${game.name} - Game`;
             button.setAttribute('id' , game.id);
             button.classList.add('game-join-button');
 

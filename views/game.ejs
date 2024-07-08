@@ -8,7 +8,6 @@
 <%- include('./partials/header.ejs') %>
 <% if(user && user.userName){ %>
 
-    <h2 class='user-username' style="">Logged in as : <%= user.userName.charAt(0).toUpperCase() + user.userName.slice(1)%></h2>
 
 <%  } %>
 
@@ -72,6 +71,7 @@
 <input type="hidden" value="<%= creator %>" name="creator"/>
 <input type="hidden" value="<%= joiner %>" name="joiner"/>
 <input type="hidden" value="<%= gameId %>" name="gameId"/>
+<input type="hidden" value="<%= gameName %>" name="gameName"/>
 
 <script src="script/game.js" defer></script>
 

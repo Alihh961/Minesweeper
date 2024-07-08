@@ -7,9 +7,8 @@
 <%- include('./partials/header.ejs') %>
 <% if(user && user.userName){ %>
 
-    <h2 class="user-username">Logged in as : <%= user.userName.charAt(0).toUpperCase() + user.userName.slice(1)%></h2>
 
-<%  } %>
+<% } %>
 
 <section class="lobby-main-section">
 
@@ -21,7 +20,17 @@
         <% if(user && user.userName){ %>
 
             <input type="hidden" value="<%= user.userName %>" name="creator">
-        <%  } %>
+        <% } %>
+        <div class="game-name-input-container">
+            <label for="gameName">Enter a game name</label>
+            <input type="text" value="" name="gameName" id="gameName">
+        </div>
+
+<!--            <div class="game-name-input-container">-->
+<!--                <label for="bot">Play against a bot?</label>-->
+<!--                <input type="checkbox" name="gameName" id="gameName">-->
+<!--            </div>-->
+
 
         <button Type="submit" onclick="" class="create-game-btn">Create a game</button>
 
@@ -32,6 +41,29 @@
 <%- include('./partials/footer.ejs') %>
 
 <script src="script/lobby.js" defer></script>
+
+<script>
+
+    let gameNameInput = document.querySelector('.game-name-input-container input');
+    let gameNameLabel = document.querySelector('.game-name-input-container label');
+
+    if(gameNameInput.value){
+        gameNameLabel.style.display = 'none';
+    }
+
+    gameNameInput.addEventListener('focus' , function(){
+        gameNameLabel.style.display = 'none';
+
+    })
+
+    gameNameInput.addEventListener('focusout' , function(event){
+        let inputValue =event.target.value;
+        if(!inputValue){
+            gameNameLabel.style.display = 'inline';
+
+        }
+    })
+</script>
 
 
 

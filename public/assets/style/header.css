@@ -34,7 +34,23 @@ header h3{
 
 header span{
     min-width: 108px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
 }
+
+header span a.logged-user{
+    text-align: center;
+    font-weight: 700;
+    font-family: sans-serif;
+    background: linear-gradient(135deg, #662bca, #8118e9);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+}
+
 
 
 header a.logout{

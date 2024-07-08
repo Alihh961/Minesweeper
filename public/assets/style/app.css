@@ -39,9 +39,15 @@ body.game-not-started:before {
     text-align: center;
     padding: 5px;
     position: relative;
-    color:  white;
-    background: rgb(99, 39, 120);
+    background: linear-gradient(135deg, #fa7d60, #eb5936);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-fill-color: transparent;
+
 }
+
+
 
 /*.user-username:before{*/
 /*    content: "";*/

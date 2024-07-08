@@ -1,23 +1,26 @@
-<%- include('../index.ejs')%>
+<%- include('../index.ejs') %>
 
 <header>
     <% if(user) { %>
-    <div>
-        <a class="home" href="/">Home</a>
+        <div>
+            <a class="home" href="/">Home</a>
 
-    </div>
-
-        <h3><%= pageTitle %></h3>
+        </div>
+        <% if( typeof pageTitle !== 'undefined' && pageTitle)  { %>
+            <h3><%= pageTitle %></h3>
+        <% } else {%>
+        <h3></h3>
+        <% }%>
 
         <span>
+            <a class="logged-user"><%= user.userName %></a>
         <a href="user/logout" class="logout"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
 
         </span>
 
         <input type="hidden" value="<%= user.userName %>" name="loggedUser"/>
-        <% } %>
+    <% } %>
 </header>
 
 <div class="whole-container">
-
 

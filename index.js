@@ -64,11 +64,14 @@ app.post('/game', requireAuth,  async (req, res) => {
 
     const creator = req.body.creator ? req.body.creator : null;
     const joiner = req.body.joiner ? req.body.joiner : null;
+    const gameName = req.body.gameName ? req.body.gameName : req.body.creator;
     const gameId = req.body.gameId;
 
     const user = res.locals.user;
 
-    res.render('game', {creator, joiner, gameId, pageTitle: `Game`});
+    console.log({gameName});
+
+    res.render('game', {creator, joiner, gameId , gameName });
 });
 
 app.post('/checkGame', (req, res) => {

@@ -8,11 +8,16 @@ const creator = document.querySelector("input[name='creator']").value;
 const joiner = document.querySelector("input[name='joiner']").value;
 const gameId = document.querySelector("input[name='gameId']").value;
 const loggedUser = document.querySelector("input[name='loggedUser']").value;
+const gameName = document.querySelector("input[name='gameName']").value;
+
+
+
 
 
 if (creator) {
     socket.emit('createAGame', {
         creator: creator,
+        gameName,
         jwt: getCookie('jwt') || getCookie('jwtG')
     });
     // document.body.style.pointerEvents = 'none';

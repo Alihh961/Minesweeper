@@ -51,6 +51,8 @@ function socketServer(io, games, guestUsers) {
                 handleJwt(data.jwt).then(() => {
 
                     game.creator = new Player(playerId, 'creator', data.creator, data.jwt);
+                    game.name = data.gameName;
+
                     games.push(game);
                     socket.join(game.id);
                     io.to(game.id).emit('gameCreatedSuccessfully', {

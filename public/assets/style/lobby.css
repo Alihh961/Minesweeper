@@ -3,10 +3,38 @@
 }
 
 .game-form {
-    display: block;
-    margin: 0 auto;
+
+    margin: 10px auto;
     background-color: transparent;
     width: fit-content;
+    min-width: 280px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.game-form div.game-name-input-container{
+
+    position: relative;
+    width: 100%;
+}
+
+.game-form div.game-name-input-container label{
+    font-weight: 700;
+    font-size: 14px;
+    position: absolute;
+    top: 6.5px;
+    left: 4px;
+}
+
+.game-form div.game-name-input-container input{
+width: 100%;
+    height: 30px;
+    border: none;
+    outline: none;
+    padding-left:4px;
+    background-color: #bebebe;
 }
 
 .games-list{
