@@ -26,6 +26,7 @@
     position: absolute;
     top: 6.5px;
     left: 4px;
+    color: black;
 }
 
 .game-form div.game-name-input-container input{

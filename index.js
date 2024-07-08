@@ -67,11 +67,13 @@ app.post('/game', requireAuth,  async (req, res) => {
     const gameName = req.body.gameName ? req.body.gameName : req.body.creator;
     const gameId = req.body.gameId;
 
+    const pageTitle = gameName+' - Game';
+
     const user = res.locals.user;
 
-    console.log({gameName});
+    console.log(gameName);
 
-    res.render('game', {creator, joiner, gameId , gameName });
+    res.render('game', {creator, joiner, gameId , gameName , pageTitle });
 });
 
 app.post('/checkGame', (req, res) => {

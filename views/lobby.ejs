@@ -16,23 +16,15 @@
 
     </div>
 
-    <form class='game-form' action="/game" method="POST">
+    <form class='game-form' method="POST" action="/game">
         <% if(user && user.userName){ %>
 
             <input type="hidden" value="<%= user.userName %>" name="creator">
         <% } %>
-        <div class="game-name-input-container">
-            <label for="gameName">Enter a game name</label>
-            <input type="text" value="" name="gameName" id="gameName">
-        </div>
+            <input type="hidden" value="" name="oppType" required>
+            <input type="hidden" value="" name="gameName" required>
 
-<!--            <div class="game-name-input-container">-->
-<!--                <label for="bot">Play against a bot?</label>-->
-<!--                <input type="checkbox" name="gameName" id="gameName">-->
-<!--            </div>-->
-
-
-        <button Type="submit" onclick="" class="create-game-btn">Create a game</button>
+        <button Type="submit" onclick="chooseGameNameAndPlayerType(event)" class="create-game-btn">Create a game</button>
 
     </form>
 
@@ -44,25 +36,42 @@
 
 <script>
 
-    let gameNameInput = document.querySelector('.game-name-input-container input');
-    let gameNameLabel = document.querySelector('.game-name-input-container label');
 
-    if(gameNameInput.value){
-        gameNameLabel.style.display = 'none';
-    }
+    async function chooseGameNameAndPlayerType(event){
+        event.preventDefault();
 
-    gameNameInput.addEventListener('focus' , function(){
-        gameNameLabel.style.display = 'none';
+        const form = document.querySelector('.game-form');
 
-    })
+        const { value: formValues } = await Swal.fire({
+            title: 'Enter game name and select opponent type',
+            html:
+                '<input id="swal-input1" class="swal2-input" placeholder="Game Name" required>' +
+                '<br>' +
+                '<input type="radio" name="oppType" value="real" required checked style="margin:10px 0 0 0" > Real Player   ' +
+                '<input type="radio" name="oppType" value="bot" required > Bot<br>' ,
+            focusConfirm: false,
+            preConfirm: () => {
+                const gameName = document.getElementById('swal-input1').value;
+                const oppType = document.querySelector('input[name="oppType"]:checked')?.value;
 
-    gameNameInput.addEventListener('focusout' , function(event){
-        let inputValue =event.target.value;
-        if(!inputValue){
-            gameNameLabel.style.display = 'inline';
+                if (!gameName || !oppType) {
+                    Swal.showValidationMessage('You need to choose a game name and an opponent type!');
+                }
+
+                return { gameName, oppType };
+            }
+        });
+
+        if (formValues) {
+            let gameName = formValues.gameName;
+            let oppType = formValues.oppType;
+            form.querySelector('input[name="gameName"]').value = gameName;
+            form.querySelector('input[name="oppType"]').value = oppType;
+            form.submit();
 
         }
-    })
+
+    }
 </script>
 
 
