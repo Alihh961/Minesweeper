@@ -10,14 +10,14 @@ const gameId = document.querySelector("input[name='gameId']").value;
 const loggedUser = document.querySelector("input[name='loggedUser']").value;
 const gameName = document.querySelector("input[name='gameName']").value;
 
-
-
+const oppType = document.querySelector("input[name='oppType']").value;
 
 
 if (creator) {
     socket.emit('createAGame', {
         creator: creator,
         gameName,
+        oppType,
         jwt: getCookie('jwt') || getCookie('jwtG')
     });
     // document.body.style.pointerEvents = 'none';
@@ -113,6 +113,23 @@ socket.on('gameJoinedSuccessfully', function (data) {
 
 });
 
+socket.on('botTurn' , function(){
+
+    let notClickedSquares = document.querySelectorAll('button.square:not(.opened)');
+
+    let square = selectRandomSquare(notClickedSquares);
+    let squareId = square.getAttribute('data-square');
+
+    socket.emit('squareClickedByBot', {
+        message: 'A square was clicked!',
+        squareId,
+        gameId: window.gameId,
+
+    });
+
+
+
+});
 
 socket.on('toggleTurnOnScreen', function (data) {
 
@@ -369,6 +386,16 @@ function getCookie(name) {
 }
 
 
+function selectRandomSquare(squares) {
 
+
+    let squaresArray = Array.from(squares);
+
+    let randomIndex = Math.floor(Math.random() * squaresArray.length);
+
+    let randomButton = squaresArray[randomIndex];
+
+    return randomButton;
+}
 
 

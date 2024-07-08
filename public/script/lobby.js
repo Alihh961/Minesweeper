@@ -83,6 +83,11 @@ function updateGamesList(games, gamesListContainer) {
             inputGameId.setAttribute('name', 'gameId');
             inputGameId.setAttribute('value', game.id);
 
+            const inputGameName = document.createElement('input');
+            inputGameName.setAttribute('type', 'hidden');
+            inputGameName.setAttribute('name', 'gameName');
+            inputGameName.setAttribute('value', game.name);
+
 
 
             const button = document.createElement('button');
@@ -98,6 +103,7 @@ function updateGamesList(games, gamesListContainer) {
 
             form.appendChild(inputUser);
             form.appendChild(inputGameId);
+            form.appendChild(inputGameName);
             form.appendChild(button);
 
 

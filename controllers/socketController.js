@@ -46,19 +46,30 @@ function socketServer(io, games, guestUsers) {
             if (!gameExists) {
                 const game = new MinesweeperGame();
 
-
                 //check if the token is related to a user then add the jwt token to the player object
                 handleJwt(data.jwt).then(() => {
 
                     game.creator = new Player(playerId, 'creator', data.creator, data.jwt);
                     game.name = data.gameName;
 
+                    if(data.oppType === 'bot'){
+                        game.closed = true;
+                        game.joiner = new Player('000' , 'bot' , 'Bot' , '000' );
+                    }
+
                     games.push(game);
+
                     socket.join(game.id);
+
                     io.to(game.id).emit('gameCreatedSuccessfully', {
                         message: 'Game created successfully',
                         game
                     });
+
+                    io.to(game.creator.id).emit('gameJoinedSuccessfully', {
+                        gameId: game.id
+                    });
+
                     io.emit('receivingAllGames', {
                         games
                     });
@@ -76,7 +87,6 @@ function socketServer(io, games, guestUsers) {
         socket.on('join', async (data) => {
             const game = io.sockets.adapter.rooms.get(data.gameId);
             let currentGame = getGameById(data.gameId);
-
             let errorMessage;
 
             let jwt = data.jwt;
@@ -93,14 +103,12 @@ function socketServer(io, games, guestUsers) {
                     }
 
                     // Object Minesweeper game
-
-
                     if (currentGame.creator.jwt === jwt) {
 
                         errorMessage = `You can't join your game!`;
 
                     } else {
-                        if (game.size === 1 && !game.closed) {
+                        if (game.size === 1 && !currentGame.closed) {
                             socket.join(data.gameId);
                             currentGame.closed = true;
 
@@ -135,6 +143,104 @@ function socketServer(io, games, guestUsers) {
             }
         });
 
+        socket.on('squareClickedByBot' , async(data)=>{
+
+            let squareId = data.squareId;
+            let gameId = data.gameId;
+            let value;
+            let currentGame;
+            let jwt = '000';
+            let clicker;
+            let opp;
+            let clickerType;
+
+
+            games.forEach(game => {
+                if (game.id === gameId) {
+
+                    if (game.checkPlayerClicks(jwt)) {
+
+
+                        clicker = game.getPlayerByJwt(jwt);
+                        opp = game.getPlayerByJwt(jwt, true);
+
+                        clickerType = clicker.type;
+
+                        if (game.nextClicker === clickerType) {
+
+
+                            value = game.returnThenRemoveAnObject(squareId, clickerType);
+
+                            currentGame = game;
+
+                            // io.to(clicker.id).emit('receiveSquareContent', {
+                            //     value,
+                            //     squareId,
+                            //     currentGame
+                            // });
+
+                            io.to(opp.id).emit('receiveSquareContent', {
+                                value,
+                                squareId,
+                                cssClass: 'byOpp',
+                                currentGame
+                            });
+
+                            toggleTurnOnScreen(currentGame);
+                            updatePlayersInfoOnScreen(currentGame);
+
+                            // check if the click ran out of lives
+                            if (!game.checkPlayerLives(clickerType)) {
+
+                                if (clickerType === 'creator') {
+
+                                    io.to(game.creator.id).emit('noMoreLivesForYou', {
+                                        gameId: game.id
+                                    });
+                                    // io.to(game.joiner.id).emit('noMoreLivesForOpp', {
+                                    //     gameId: game.id
+                                    //
+                                    // });
+
+
+                                } else if (clickerType === 'bot') {
+                                    // io.to(game.joiner.id).emit('noMoreLivesForYou', {
+                                    //     game
+                                    // });
+                                    io.to(game.creator.id).emit('noMoreLivesForOpp', {
+                                        game
+                                    });
+
+
+                                }
+
+                            }
+
+                            // when the joiner runs out of clicks that mean the same for creator because they both have the same number of clicks
+                            if (!game.joiner.clicksLeft) {
+                                setTimeout(() => {
+
+
+                                    checkWinnerAndCloseTheGame(game);
+
+                                }, 1000);
+                            }
+
+                        } else {
+                            socket.emit('notYourClick');
+                        }
+
+                        if(opp.type === 'bot'){
+                            io.to(game.id).emit('botTurn');
+                        }
+                    } else {
+                        console.log(`The ${clickerType} ran out of clicks`);
+                    }
+                }
+            });
+
+
+        });
         socket.on('squareClicked', async (data) => {
 
             let squareId = data.squareId;
@@ -221,6 +327,10 @@ function socketServer(io, games, guestUsers) {
                         } else {
                             socket.emit('notYourClick');
                         }
+
+                        if(opp.type === 'bot'){
+                            io.to(game.id).emit('botTurn');
+                        }
                     } else {
                         console.log(`The ${clickerType} ran out of clicks`);
                     }
@@ -285,7 +395,6 @@ function socketServer(io, games, guestUsers) {
         })
 
         socket.on('fired', (data) => {
-            console.log(data.gameId);
         })
 
         function closeAGame(id) {
