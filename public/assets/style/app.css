@@ -46,6 +46,46 @@ body.game-not-started:before {
     text-fill-color: transparent;
 }
 
+
+#loadingMessage {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(184, 184, 184, 1);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5em;
+    z-index: 1000;
+    display: none; /* Initially hidden */
+}
+
+.loading-text {
+    display: flex;
+    align-items: center;
+}
+
+.loading-circle {
+    width: 24px;
+    height: 24px;
+    border: 3px solid #ccc;
+    border-top: 3px solid #333;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-left: 10px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 /*.user-username:before{*/
 /*    content: "";*/
 /*    position: absolute;*/

@@ -100,6 +100,13 @@ app.get('/lobby' , requireAuth, (req, res) => {
 
 });
 
+app.get('/logout' , (req,res)=>{
+    res.cookie('jwt', '', {maxAge: 1});
+    res.cookie('jwtG', '', {maxAge: 1});
+
+    res.redirect('/');
+});
+
 app.get('/set-cookies', (req, res) => {
     res.cookie('newUser', false, {maxAge: 1000 * 60 * 60 * 24, secure: true}); // secure will be set only with secured connections
     res.send('new USer');
