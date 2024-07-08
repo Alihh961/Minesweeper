@@ -55,22 +55,25 @@ function socketServer(io, games, guestUsers) {
                     if(data.oppType === 'bot'){
                         game.closed = true;
                         game.joiner = new Player('000' , 'bot' , 'Bot' , '000' );
+                        io.to(game.creator.id).emit('gameJoinedSuccessfully', {
+                            gameId: game.id
+                        });
                     }
 
                     games.push(game);
 
                     socket.join(game.id);
 
+
                     io.to(game.id).emit('gameCreatedSuccessfully', {
+
                         message: 'Game created successfully',
                         game
                     });
 
-                    io.to(game.creator.id).emit('gameJoinedSuccessfully', {
-                        gameId: game.id
-                    });
 
-                    io.emit('receivingAllGames', {
+
+                    io.emit('fetchingAllGames', {
                         games
                     });
 
@@ -446,6 +449,7 @@ function socketServer(io, games, guestUsers) {
                 score: game.creator.score,
                 clicksLeft: game.creator.clicksLeft
             };
+            console.log(game);
             const joinerInfo = {
                 lives: game.joiner.lives,
                 score: game.joiner.score,

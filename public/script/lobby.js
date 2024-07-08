@@ -46,7 +46,7 @@ socket.on('disconnect', () => {
 
 socket.emit('getAllGames');
 
-socket.on('receivingAllGames', (data) => {
+socket.on('fetchingAllGames', (data) => {
 
     allGames = data.games;
     if (gamesListContainer) {
