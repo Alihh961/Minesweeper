@@ -8,7 +8,14 @@ const userModel = require('../models/UserModel');
 const handleJwt = async (jwtToken) => {
     try {
         const decodedToken = jwt.verify(jwtToken, process.env.APP_SECRET);
-        const user = await userModel.findById(decodedToken.id);
+        let user ;
+        if(await userModel.findById(decodedToken.id)){
+            user = await userModel.findById(decodedToken.id);
+        }else if(decodedToken.id && decodedToken.userName){
+            user = {id: decodedToken.id, userName: decodedToken.userName};
+
+        }
+
 
         return {user, status: true};
     } catch (err) {
@@ -18,7 +25,7 @@ const handleJwt = async (jwtToken) => {
 }
 
 
-function socketServer(io, games , guestUsers) {
+function socketServer(io, games, guestUsers) {
 
     io.on('connection', (socket) => {
 
@@ -69,6 +76,7 @@ function socketServer(io, games , guestUsers) {
             let currentGame = getGameById(data.gameId);
 
             let errorMessage;
+
             let jwt = data.jwt;
 
 
@@ -76,8 +84,8 @@ function socketServer(io, games , guestUsers) {
                 try {
                     const results = await handleJwt(jwt);
 
-                    if (!results.status) {
 
+                    if (!results.status) {
                         errorMessage = 'Unknown Error';
                         throw new Error('Invalid JWT or authentication failed');
                     }
@@ -102,6 +110,7 @@ function socketServer(io, games , guestUsers) {
 
                             toggleTurnOnScreen(currentGame);
                             updatePlayersInfoOnScreen(currentGame);
+
 
                             io.emit('receivingAllGames', {games});
                         } else if (currentGame.closed) {
@@ -273,7 +282,7 @@ function socketServer(io, games , guestUsers) {
 
         })
 
-        socket.on('fired' , (data)=>{
+        socket.on('fired', (data) => {
             console.log(data.gameId);
         })
 

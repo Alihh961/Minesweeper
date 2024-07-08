@@ -13,12 +13,12 @@ const loggedUser = document.querySelector("input[name='loggedUser']").value;
 if (creator) {
     socket.emit('createAGame', {
         creator: creator,
-        jwt: getCookie('jwt')
+        jwt: getCookie('jwt') || getCookie('jwtG')
     });
     // document.body.style.pointerEvents = 'none';
     document.body.classList.add('game-not-started');
 } else if (joiner) {
-    socket.emit('join', {joiner: loggedUser, gameId: gameId, jwt: getCookie('jwt')});
+    socket.emit('join', {joiner: loggedUser, gameId: gameId, jwt: getCookie('jwt') || getCookie('jwtG')});
 } else {
     window.location.href = '/lobby';
 }
@@ -96,7 +96,7 @@ socket.on('gameJoinedSuccessfully', function (data) {
                     message: 'A square was clicked!',
                     squareId,
                     gameId: window.gameId,
-                    jwt: getCookie('jwt')
+                    jwt: getCookie('jwt') || getCookie('jwtG')
 
                 });
             }
@@ -248,7 +248,7 @@ window.addEventListener('beforeunload', () => {
         socket.emit('closeGame', {
             gameId: window.gameId,
             message: 'close the game of id ' + window.gameId,
-            jwt: getCookie('jwt'),
+            jwt: getCookie('jwt') || getCookie('jwtG'),
             refreshed: true
         });
     }
@@ -260,7 +260,7 @@ window.addEventListener('pagehide', () => {
         socket.emit('closeGame', {
             gameId: window.gameId,
             message: 'close the game of id ' + window.gameId,
-            jwt: getCookie('jwt'),
+            jwt: getCookie('jwt') || getCookie('jwtG'),
             refreshed: true
         });
     }
@@ -364,7 +364,6 @@ function getCookie(name) {
 }
 
 
-// redirecting to lobby and delete the game if the user reload the page
 
 
 

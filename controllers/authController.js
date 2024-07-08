@@ -106,7 +106,6 @@ const login = async (req, res) => {
 
 };
 
-
 const logout = (req, res) => {
     res.cookie('jwt', '', {maxAge: 1});
     res.cookie('jwtG', '', {maxAge: 1});
@@ -149,7 +148,7 @@ const createRandomGuest = async (req, res, next) => {
 
 const signToken = function (id , userName) {
     return jwt.sign(
-        {id , userName} /* payload*/,
+        {_id : id , userName} /* payload*/,
         process.env.APP_SECRET /* secret string */,
         {
             expiresIn: maxAge /* expire date */,

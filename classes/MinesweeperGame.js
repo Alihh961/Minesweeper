@@ -122,6 +122,8 @@ class MinesweeperGame {
 
     // getOpp = true  will return the second player
     getPlayerByJwt(jwt, getOpp = false) {
+        console.log({jwt});
+
         if (this.creator.jwt === jwt) {
 
             if (getOpp) {
