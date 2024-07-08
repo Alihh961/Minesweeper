@@ -48,7 +48,7 @@ const userIsAuthenticated = (req, res, next) => {
                 } else {
 
                     try {
-                        const user = await userModel.findById(decodedToken.id);
+                        const user = await userModel.findById(decodedToken._id);
                         if (!user) {
                             throw new Error('User not found');
                         }
